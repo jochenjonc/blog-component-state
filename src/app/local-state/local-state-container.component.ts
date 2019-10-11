@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {of,from, Subject, interval} from 'rxjs';
+import {of,from, Subject, timer} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import { ContainerFacade } from './container.facade';
 
@@ -8,14 +8,18 @@ import { ContainerFacade } from './container.facade';
   template: `
    <h2>Container</h2>
   inputValue$: {{inputValue$ | async}}<br/>
-  o$: {{o$ | async | json}}
+  <ul>
+    <li *ngFor="let i of list$ | async">
+      i: {{i | json}}
+    </li>
+  </ul>
   <local-state-chart></local-state-chart>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LocalStateContainerComponent {
 
-  o$ = this.facade.o;
+  list$ = this.facade.list$;
 
   inputValue$ = new Subject();
   @Input()
@@ -24,8 +28,8 @@ export class LocalStateContainerComponent {
   }
 
   constructor(private facade: ContainerFacade) {
-      // @TODO use animation frame to stop polling when leaving tab
-     //  this.facade.serverUpdateOn(interval(10000));
+    // @TODO use animation frame to stop polling when leaving tab
+    this.facade.serverUpdateOn(timer(0, 10000));
   }
   
 }
