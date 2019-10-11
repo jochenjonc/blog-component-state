@@ -11,7 +11,7 @@ const _listReducer = createReducer(
     ...state, 
     list: Array.from(new Map([
       ...state.list, 
-      ...action.list])) as any
+      ...action.list].)) as any
     })
   )
 );

@@ -32,7 +32,7 @@ import { LocalStateChartComponent } from './local-state/local-state-chart.compon
 @NgModule({
   imports:      [ 
   BrowserModule, HttpClientModule,
-  StoreModule.forRoot({page: 
+  StoreModule.forRoot({github: 
     (state: any | undefined, action: any) => listReducer(state, action)
   }),
   EffectsModule.forRoot([GlobalEffects]), 

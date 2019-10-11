@@ -10,7 +10,7 @@ import { loadList } from './global-state/actions';
 })
 export class ContainerFacade extends ComponentStateService {
 
-  o = this.store.select(s => s).pipe(tap(console.log));
+  list$ = this.store.select(s => s).pipe(tap(console.log));
 
   constructor(private store: Store<any>) {
     super();
