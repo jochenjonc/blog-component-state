@@ -2,10 +2,10 @@ import { createSelector } from '@ngrx/store';
 import { GitHubState } from './reducer';
  
 export interface AppState {
-  gtihub: GitHubState;
+  github: GitHubState;
 }
  
-export const selectGitHub = (state: AppState) => state.gtihub;
+export const selectGitHub = (state: AppState) => state.github;
  
 export const selectGitHubList = createSelector(
   selectGitHub,

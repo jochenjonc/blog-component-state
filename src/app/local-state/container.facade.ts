@@ -19,7 +19,7 @@ export class ContainerFacade extends ComponentStateService {
 
   serverUpdateOn(o) {
     this.connectEffects([
-      o.pipe(tap(_ => this.store.dispatch(loadList()))
+      o.pipe(tap(_ => this.store.dispatch(loadList())))
     ]);
   }
 
