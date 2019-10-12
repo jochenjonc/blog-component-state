@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ComponentStateService, selectSlice} from './component-state.service';
 import {Observable, combineLatest} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {tap, map} from 'rxjs/operators';
 import { loadList } from './global-state/actions';
 import { selectGitHubList } from './global-state/selectors';
 
@@ -16,9 +16,10 @@ export class ContainerFacade extends ComponentStateService {
   selectedItems$ = this.state$.pipe((selectSlice(s => s.selectedItems$)));
   refreshMs$: Observable<number> = this.state$.pipe((selectSlice(s => s.refreshMs$)));
 
-  listConfig$ = combineLatest( this.list$, this.selectedItems$, 
-  ([list, selectedItems]) => ({ list, selectedItems }) );
-  
+  listConfig$ = combineLatest( this.list$, this.selectedItems$).pipe( 
+    map(([list, selectedItems]) => { console.log(list, selectedItems); return ({ list, selectedItems }) })
+  );
+
   constructor(private store: Store<any>) {
     super();
 
