@@ -17,7 +17,7 @@ export class GitHubService {
       {id:2, name:'two'}, 
       {id:3, name:'three'},
       {id:4, name:'four'},
-      {id:~~(Math.random() * 10), name:'random'}
+      {id:~~(Math.random() * 10), name:'random'+~~(Math.random()*10)}
     ])
   }
 
