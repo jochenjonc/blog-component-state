@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ComponentStateService, selectSlice} from './component-state.service';
-import {Observable} from 'rxjs';
+import {Observable, combineLatest} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import { loadList } from './global-state/actions';
 import { selectGitHubList } from './global-state/selectors';
@@ -13,8 +13,12 @@ import { selectGitHubList } from './global-state/selectors';
 export class ContainerFacade extends ComponentStateService {
 
   list$ = this.state$.pipe((selectSlice(s => s.list$)));
+  selectedItems$ = this.state$.pipe((selectSlice(s => s.selectedItems$)));
   refreshMs$: Observable<number> = this.state$.pipe((selectSlice(s => s.refreshMs$)));
 
+  listConfig$ = combineLatest( this.list$, this.selectedItems$, 
+  ([list, selectedItems]) => ({ list, selectedItems }) );
+  
   constructor(private store: Store<any>) {
     super();
 

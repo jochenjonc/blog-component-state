@@ -7,13 +7,13 @@ import { ContainerFacade } from './container.facade';
   selector: 'local-state-container',
   template: `
    <h2>Container</h2>
-  <local-state-chart [list]="list$ | async"></local-state-chart>
+  <local-state-chart [config]="listConfig$ | async"></local-state-chart>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LocalStateContainerComponent {
 
-  list$ = this.facade.list$;
+  listConfig$ = this.facade.listConfig$;
 
   inputValue$ = new Subject<number>();
   @Input()
@@ -21,9 +21,12 @@ export class LocalStateContainerComponent {
     this.inputValue$.next(v)
   }
 
+  selectedItems$ = new Subject(); 
+
   constructor(private facade: ContainerFacade) {
     // @TODO use animation frame to stop polling when leaving tab
     this.facade.connectSlices({refreshMs$: this.inputValue$});
+    this.facade.connectSlices({selectedItems$: this.selectedItems$});
     this.facade.serverUpdateOn(this.facade.refreshMs$.pipe(switchMap(ms => timer(0, ms || 10000))));
   }
   
