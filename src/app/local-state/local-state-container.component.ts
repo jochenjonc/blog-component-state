@@ -7,13 +7,7 @@ import { ContainerFacade } from './container.facade';
   selector: 'local-state-container',
   template: `
    <h2>Container</h2>
-  inputValue$: {{inputValue$ | async}}<br/>
-  <ul>
-    <li *ngFor="let i of list$ | async">
-      i: {{i | json}}
-    </li>
-  </ul>
-  <local-state-chart></local-state-chart>
+  <local-state-chart [list]="list$ | async"></local-state-chart>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
