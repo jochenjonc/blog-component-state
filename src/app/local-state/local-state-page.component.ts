@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
-import {of, interval} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {of, timer} from 'rxjs';
+import {tap, map} from 'rxjs/operators';
 
 @Component({
   selector: 'local-state-page',
@@ -12,5 +12,5 @@ import {tap} from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LocalStatePageComponent {
-  num$ = interval(1000);
+  num$ = timer(0, 10000).pipe(map(_ => Math.random() < 0.5 ? 10000 : 5000));
 }

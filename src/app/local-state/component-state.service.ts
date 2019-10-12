@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, Optional } from '@angular/core';
 import { Router } from '@angular/router';
-import {interval, ConnectableObservable, merge, Observable, Subject} from 'rxjs';
-import {endWith, map, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
+import {interval, ConnectableObservable, pipe, merge, Observable, Subject} from 'rxjs';
+import {endWith, map,distinctUntilChanged, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -76,4 +76,13 @@ export class ComponentStateService implements OnDestroy {
     this.onDestroy$.next(true);
   }
 
+}
+
+export function selectSlice<T>(mapToSliceFn: (s: any) => any) {
+  return pipe(
+    map(s => {
+      return (s !== undefined) ? mapToSliceFn(s) : s;
+    }),
+    distinctUntilChanged<T>()
+  );
 }

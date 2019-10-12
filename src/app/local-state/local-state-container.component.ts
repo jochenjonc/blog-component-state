@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {of,from, Subject, timer} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {tap, switchMap} from 'rxjs/operators';
 import { ContainerFacade } from './container.facade';
 
 @Component({
@@ -21,15 +21,16 @@ export class LocalStateContainerComponent {
 
   list$ = this.facade.list$;
 
-  inputValue$ = new Subject();
+  inputValue$ = new Subject<number>();
   @Input()
-  set inputValue(v) {
+  set inputValue(v: number) {
     this.inputValue$.next(v)
   }
 
   constructor(private facade: ContainerFacade) {
     // @TODO use animation frame to stop polling when leaving tab
-    this.facade.serverUpdateOn(timer(0, 10000));
+    this.facade.connectSlices({refreshMs$: this.inputValue$});
+    this.facade.serverUpdateOn(this.facade.refreshMs$.pipe(switchMap(ms => timer(0, ms || 10000))));
   }
   
 }
