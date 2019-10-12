@@ -2,6 +2,7 @@ import { NgModule, DoBootstrap } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import {ReactiveFormsModule} from '@angular/forms';
 import { StoreModule} from '@ngrx/store';
 import { EffectsModule} from '@ngrx/effects';
 
@@ -31,7 +32,7 @@ import { LocalStateChartComponent } from './local-state/local-state-chart.compon
 
 @NgModule({
   imports:      [ 
-  BrowserModule, HttpClientModule,
+  BrowserModule, HttpClientModule, ReactiveFormsModule,
   StoreModule.forRoot({github: 
     (state: any | undefined, action: any) => listReducer(state, action)
   }),

@@ -6,7 +6,7 @@ import { ContainerFacade } from './container.facade';
 @Component({
   selector: 'local-state-container',
   template: `
-   <h2 *ngFor>Container</h2>
+   <h2>Container</h2>
   <local-state-chart [config]="listConfig$ | async"></local-state-chart>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

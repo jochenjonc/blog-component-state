@@ -17,7 +17,7 @@ export class ContainerFacade extends ComponentStateService {
   refreshMs$: Observable<number> = this.state$.pipe((selectSlice(s => s.refreshMs$)));
 
   listConfig$ = combineLatest( this.list$, this.selectedItems$).pipe( 
-    map(([list, selectedItems]) => { console.log(list, selectedItems); return ({ list, selectedItems }) })
+    map(([list, selectedItems]) => ({ list, selectedItems }) )
   );
 
   constructor(private store: Store<any>) {
