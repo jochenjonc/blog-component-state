@@ -6,11 +6,13 @@ import {tap} from 'rxjs/operators';
   selector: 'local-state-chart',
   template: `
    <h3>Display only chart</h3>
-   <ul>
-    <li *ngFor="let i of list$ | async">
-     {{i.id}}:{{i.name}}
-    </li>
-   </ul>
+   <form>
+    <ul>
+      <li *ngFor="let i of list$ | async">
+      {{i.id}}:{{i.name}} <input type="checkbox">
+      </li>
+    </ul>
+   </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

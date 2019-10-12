@@ -50,6 +50,7 @@ export class ComponentStateService implements OnDestroy {
     this.onDestroy$.subscribe(_ => subscription.unsubscribe());
   }
 
+  // @TODO to implement. Solves the case where we add an operator i.e. map and mae the observable cold. if the result is single shot and the consumer is a late subscriber we share replay it. (becahsu publishReplay is not needed?)
   select(selector) {
     return this.state$
       .pipe(
