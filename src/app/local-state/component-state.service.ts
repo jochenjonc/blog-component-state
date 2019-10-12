@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import {interval, ConnectableObservable, pipe, merge, Observable, Subject} from 'rxjs';
-import {endWith, map,distinctUntilChanged, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
+import {endWith, shareReplay, map,distinctUntilChanged, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +48,14 @@ export class ComponentStateService implements OnDestroy {
     subscription.add((this.effect$ as ConnectableObservable<any>).connect());
 
     this.onDestroy$.subscribe(_ => subscription.unsubscribe());
+  }
+
+  select(selector) {
+    return this.state$
+      .pipe(
+        selector,
+        shareReplay(1)
+      );
   }
 
   connectSlices(config: { [key: string]: Observable<any> }): void {
