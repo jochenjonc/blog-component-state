@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {Router } from '@angular/router';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'my-app',
@@ -20,7 +21,8 @@ import {Router } from '@angular/router';
 })
 export class AppComponent  {
 
-  constructor(){
+  constructor(http: HttpClient){
+    http.get('https://api.github.com/users/BioPhoton').subscribe(console.log)
     console.log('AppComponent Constructor'); 
   }
 
