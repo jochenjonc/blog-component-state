@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, Optional } from '@angular/core';
 import { Router } from '@angular/router';
-import {interval, ConnectableObservable, pipe, merge, Observable, Subject} from 'rxjs';
-import {endWith, shareReplay, map,distinctUntilChanged, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
+import {interval, animationFrameScheduler, ConnectableObservable, pipe, merge, Observable, Subject} from 'rxjs';
+import {endWith, shareReplay,observeOn, map,distinctUntilChanged, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,7 @@ export class ComponentStateService implements OnDestroy {
     .pipe(
       mergeAll(),
       takeUntil(this.onDestroy$),
+      observeOn(animationFrameScheduler),
       publishReplay(1)
     );
 
@@ -50,15 +51,6 @@ export class ComponentStateService implements OnDestroy {
     this.onDestroy$.subscribe(_ => subscription.unsubscribe());
   }
 
-  // @TODO to implement. Solves the case where we add an operator i.e. map and mae the observable cold. if the result is single shot and the consumer is a late subscriber we share replay it. (becahsu publishReplay is not needed?)
-  select(selector) {
-    return this.state$
-      .pipe(
-        selectSlice(selector),
-        shareReplay(1)
-      );
-  }
-
   connectSlices(config: { [key: string]: Observable<any> }): void {
     // @TODO validation / typing params
     // @TODO consider multiple observables for the same key. Here I would suggest last one wins => switchAll
@@ -73,7 +65,6 @@ export class ComponentStateService implements OnDestroy {
 
   // @TODO implement key values to override effects
   connectEffects(effects: Observable<any>[]): void {
-    console.log('connectEffects', effects);
     // @TODO validation / typing params
     effects
       .forEach(effect$ =>  {

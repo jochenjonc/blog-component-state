@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {of,from, Subject, timer} from 'rxjs';
-import {tap, switchMap} from 'rxjs/operators';
+import {of,from, Subject, timer, ReplaySubject} from 'rxjs';
+import {tap, map, switchMap, scan} from 'rxjs/operators';
 import { ContainerFacade } from './container.facade';
 
 @Component({
@@ -14,10 +14,11 @@ import { ContainerFacade } from './container.facade';
 export class LocalStateContainerComponent {
 
   listConfig$ = this.facade.listConfig$;
-
+  
   inputValue$ = new Subject<number>();
   @Input()
   set inputValue(v: number) {
+    console.log('InputValue facade', v);
     this.inputValue$.next(v)
   }
 
@@ -28,6 +29,7 @@ export class LocalStateContainerComponent {
     this.facade.connectSlices({refreshMs$: this.inputValue$});
     this.facade.connectSlices({selectedItems$: this.selectedItems$});
     this.facade.serverUpdateOn(this.facade.refreshMs$.pipe(switchMap(ms => timer(0, ms || 10000))));
+    
   }
   
 }

@@ -16,7 +16,7 @@ import {shareReplay, map,tap,startWith, switchMap} from 'rxjs/operators';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LocalStateChartComponent {
+export class LocalStateListComponent {
 
   config$ = new Subject<any[]>();
   @Input()

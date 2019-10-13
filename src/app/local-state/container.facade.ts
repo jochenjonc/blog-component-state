@@ -22,6 +22,7 @@ export class ContainerFacade extends ComponentStateService {
 
   constructor(private ngRxStore: Store<any>) {
     super();
+    this.refreshMs$.subscribe({next(n) {console.log('FAC CTOR', v); }})
 
     this.connectSlices({list$: this.ngRxStore.select(selectGitHubList)});
   }

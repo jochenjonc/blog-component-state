@@ -25,10 +25,8 @@ import { LateSubscriberDisplayComponent } from './late-subscriber/late-subscribe
 
 import { LocalStatePageComponent } from './local-state/local-state-page.component';
 import { LocalStateContainerComponent } from './local-state/local-state-container.component';
-import { LocalStateChartComponent } from './local-state/local-state-chart.component';
+import { LocalStateListComponent } from './local-state/local-state-list.component';
   
-
-
 
 @NgModule({
   imports:      [ 
@@ -65,7 +63,7 @@ import { LocalStateChartComponent } from './local-state/local-state-chart.compon
     LateSubscribersContainerComponent,
     LateSubscriberDisplayComponent,
 
-    LocalStatePageComponent,  LocalStateContainerComponent, LocalStateChartComponent
+    LocalStatePageComponent,  LocalStateContainerComponent, LocalStateListComponent
    ],
   bootstrap:    [ AppComponent ]
 })
