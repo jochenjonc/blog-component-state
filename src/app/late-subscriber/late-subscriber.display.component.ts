@@ -1,26 +1,26 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, AfterContentChecked, AfterViewInit} from '@angular/core';
-import {of, ReplaySubject, Subject} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {Subject} from 'rxjs';
 
 @Component({
-  selector: 'late-subscriber-display',
-  template: `
+    selector: 'late-subscriber-display',
+    template: `
     <h2>Late Subscriber Child</h2>
     <p><b>state$:</b></p>
     <pre>{{state$ | async | json}}</pre>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LateSubscriberDisplayComponent {
 
- 
-  state$ = new Subject();
-  @Input()
-  set state(value) {
-    this.state$.next({value});
-  }
 
-  constructor() {
-  }
+    state$ = new Subject();
+
+    constructor() {
+    }
+
+    @Input()
+    set state(value) {
+        this.state$.next({value});
+    }
 
 }

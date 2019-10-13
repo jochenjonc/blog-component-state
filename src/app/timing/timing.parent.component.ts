@@ -1,10 +1,20 @@
-import {ChangeDetectionStrategy, Component, OnChanges, OnInit, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy} from '@angular/core';
+import {
+    AfterContentChecked,
+    AfterContentInit,
+    AfterViewChecked,
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    OnChanges,
+    OnDestroy,
+    OnInit
+} from '@angular/core';
 import {of} from 'rxjs';
 import {tap} from 'rxjs/operators';
 
 @Component({
-  selector: 'timing-parent',
-  template: `
+    selector: 'timing-parent',
+    template: `
    <p>Parent Template Expression: {{templateExpression$ | async}}</p>
     <timing-child 
       [value]="templateBinding$ | async"
@@ -12,44 +22,44 @@ import {tap} from 'rxjs/operators';
     >
     </timing-child>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TimingParentComponent implements OnChanges, OnInit, AfterContentInit, AfterContentChecked,  AfterViewInit, AfterViewChecked, OnDestroy {
+export class TimingParentComponent implements OnChanges, OnInit, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy {
 
-  templateExpression$ = of('expresoin').pipe(tap(_ => console.log('ParentComponent template expression')));
+    templateExpression$ = of('expresoin').pipe(tap(_ => console.log('ParentComponent template expression')));
 
-  templateBinding$ = of('binding').pipe(tap(_ => console.log('ParentComponent template binding')));
+    templateBinding$ = of('binding').pipe(tap(_ => console.log('ParentComponent template binding')));
 
-  constructor() {
-    console.log('ParentComponent Constructor');
-  }
+    constructor() {
+        console.log('ParentComponent Constructor');
+    }
 
-  ngOnChanges(changes) {
-    console.log('ParentComponent OnChanges', changes);
-  }
+    ngOnChanges(changes) {
+        console.log('ParentComponent OnChanges', changes);
+    }
 
-  ngOnInit() {
-    console.log('ParentComponent ngOnInit');
-  }
+    ngOnInit() {
+        console.log('ParentComponent ngOnInit');
+    }
 
-  ngAfterContentInit() {
-    console.log('ParentComponent AfterContentInit');
-  }
+    ngAfterContentInit() {
+        console.log('ParentComponent AfterContentInit');
+    }
 
-  ngAfterContentChecked() {
-    console.log('ParentComponent AfterContentChecked');
-  }
+    ngAfterContentChecked() {
+        console.log('ParentComponent AfterContentChecked');
+    }
 
-  ngAfterViewInit() {
-    console.log('ParentComponent AfterViewInit');
-  }
+    ngAfterViewInit() {
+        console.log('ParentComponent AfterViewInit');
+    }
 
-  ngAfterViewChecked() {
-    console.log('ParentComponent AfterViewChecked');
-  }
+    ngAfterViewChecked() {
+        console.log('ParentComponent AfterViewChecked');
+    }
 
-  ngOnDestroy() {
-    console.log('ParentComponent OnDestroy');
-  }
+    ngOnDestroy() {
+        console.log('ParentComponent OnDestroy');
+    }
 
 }

@@ -1,34 +1,37 @@
-import { Component } from '@angular/core';
-import {Router } from '@angular/router';
+import {Component} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
 @Component({
-  selector: 'my-app',
-  template: `
-  <ul>
-    <li>
-     <a [routerLink]="['timing']">timing</a>
-    </li>
-     <li>
-     <a [routerLink]="['late-subscriber']">Late Subscriber</a>
-    </li>
-    
-     <li>
-     <a [routerLink]="['subscription-handling']">Subscription Handling</a>
-    </li>
-    
-    <li>
-     <a [routerLink]="['local-state']">Local State</a>
-    </li>
-  </ul>
-  <router-outlet></router-outlet>
-  `
-})
-export class AppComponent  {
+    selector: 'my-app',
+    template: `
+        <ul>
+            <li>
+                <a [routerLink]="['timing']">timing</a>
+            </li>
+            <li>
+                <a [routerLink]="['late-subscriber']">Late Subscriber</a>
+            </li>
 
-  constructor(http: HttpClient){
-    http.get('https://api.github.com/users/BioPhoton').subscribe(console.log)
-    console.log('AppComponent Constructor'); 
-  }
+            <li>
+                <a [routerLink]="['subscription-handling']">Subscription Handling</a>
+            </li>
+
+            <li>
+                <a [routerLink]="['cold-composition']">Cold Composition</a>
+            </li>
+
+            <li>
+                <a [routerLink]="['local-state']">Local State</a>
+            </li>
+        </ul>
+        <router-outlet></router-outlet>
+    `
+})
+export class AppComponent {
+
+    constructor(http: HttpClient) {
+        http.get('https://api.github.com/users/BioPhoton').subscribe(console.log)
+        console.log('AppComponent Constructor');
+    }
 
 }

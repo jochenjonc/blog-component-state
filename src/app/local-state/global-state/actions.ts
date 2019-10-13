@@ -1,16 +1,15 @@
-import { createAction, props } from '@ngrx/store';
+import {createAction, props} from '@ngrx/store';
 
 
 export const loadList = createAction(
-  '[List] load', 
-  props<{params: {[key: string]: any}}>()
+    '[List] load'
 );
 export const listLoadedError = createAction(
-  '[List] loadError', 
-  props<{error: string}>()
+    '[List] loadError',
+    props<{ error: string }>()
 );
 
 export const listLoadedSuccess = createAction(
-  '[List] loadSuccess', 
-  props<{list: any[]}>()
+    '[List] loadSuccess',
+    props<{ list: any[] }>()
 );

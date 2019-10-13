@@ -1,25 +1,25 @@
-import {ChangeDetectionStrategy, Component, OnDestroy} from '@angular/core';
-import {timer, Subject} from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {Subject, timer} from 'rxjs';
 import {takeUntil, tap} from 'rxjs/operators';
 
 @Component({
-  selector: 'subscription-handling-bad',
-  template: `
+    selector: 'subscription-handling-bad',
+    template: `
    <h1>Subscription Handling</h1>
   `
 })
 export class SubscriptionHandlingBadComponent implements OnDestroy {
-  onDestroy$ = new Subject();
+    onDestroy$ = new Subject();
 
-  sideEffect$ = timer(0, 1000).pipe(tap(console.log));
+    sideEffect$ = timer(0, 1000).pipe(tap(console.log));
 
-  constructor()  {
-   this.sideEffect$
-     .pipe(takeUntil(this.onDestroy$))
-     .subscribe();
-  }
+    constructor() {
+        this.sideEffect$
+            .pipe(takeUntil(this.onDestroy$))
+            .subscribe();
+    }
 
-  ngOnDestroy(): void {
-    this.onDestroy$.next(true);
-  }
+    ngOnDestroy(): void {
+        this.onDestroy$.next(true);
+    }
 }
