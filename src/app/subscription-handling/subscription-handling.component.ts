@@ -3,7 +3,6 @@ import {timer} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {SubscriptionHandlingService} from './subscription-handling.service';
 
-
 @Component({
   selector: 'subscription-handling',
   template: `
