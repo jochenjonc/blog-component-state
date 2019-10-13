@@ -1,24 +1,29 @@
 import {ChangeDetectionStrategy, Input,Output, Component} from '@angular/core';
-import {FormGroup} from '@angular/forms'
+import {FormGroup, FormBuilder} from '@angular/forms'
 import {Subject, Observable} from 'rxjs';
-import {shareReplay, map,tap,startWith, switchMap} from 'rxjs/operators';
+import {shareReplay, map, filter, tap, startWith, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'local-state-chart',
   template: `
   {{(form$ | async).value | json}}
    <h3>Display only chart</h3>
-   <div>
+   <form [formGroup]="form$ | async">
     <ul>
-      <li *ngFor="let item of (config$ | async)?.list">{{item.name}}</li>
+      <li *ngFor="let item of (config$ | async)?.list">
+      <label>
+        <input type="checkbox" [formControlName]="item.id">
+        {{item.name}}
+      </label>
+      </li>
     </ul>
-   </div>
+   </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LocalStateListComponent {
 
-  config$ = new Subject<any[]>();
+  config$ = new Subject<any[]>(); 
   @Input()
   set config(cfg) {
     this.config$.next(cfg || {});
@@ -28,20 +33,28 @@ export class LocalStateListComponent {
     .pipe(
       map(cfg => this.selectFormConfig(cfg)),
       startWith({}),
-      map(fCfg => new FormGroup(fCfg)),
-      tap(console.log),
+      map(fCfg => this.fb.group(fCfg)),
       shareReplay(1)
     );
   
- // @Output()
- // change = this.form$.pipe(switchMap(f => f.valueChanges()));
+ @Output()
+ selectedItemsChange = this.form$
+    .pipe(
+      switchMap(f => f.valueChanges),
+      map(obj => Object.entries(obj).filter(a => a[1]).map(a => a[0])),
+            tap(console.log)
+    );
+
+ constructor(private fb: FormBuilder) {
+
+ }
 
   selectFormConfig(cfg): any {
-    if('list' in cfg && 'selectedItems' in isArray(cfg && cfg.selectedItems) ) {
-
+   console.log('cfg', cfg);
+    if('list' in cfg && 'selectedItems' in cfg) {
+      return cfg.list
+        .reduce((acc, i) => ({...acc, [i.id]: !!(cfg.selectedItems.indexOf(i.id) !== -1)}), {})
     }
-    return cfg.list
-     .reduce((acc, i) => ({[i.id]: !!(cfg.selectedItems.indexOf(i.id) !== -1)}), {})
   }
 
 }

@@ -14,7 +14,8 @@ export class ContainerFacade extends ComponentStateService {
 
   list$ = this.state$.pipe((selectSlice(s => s.list$)));
   selectedItems$ = this.state$.pipe((selectSlice(s => s.selectedItems$)));
-  refreshMs$: Observable<number> = this.state$.pipe((selectSlice(s => s.refreshMs$)));
+  refreshMs$: Observable<number> = this.state$
+    .pipe((selectSlice(s => s.refreshMs$)));
 
   listConfig$ = combineLatest( this.list$, this.selectedItems$).pipe( 
     map(([list, selectedItems]) => ({ list, selectedItems }) )
@@ -22,8 +23,6 @@ export class ContainerFacade extends ComponentStateService {
 
   constructor(private ngRxStore: Store<any>) {
     super();
-    this.refreshMs$.subscribe({next(n) {console.log('FAC CTOR', v); }})
-
     this.connectSlices({list$: this.ngRxStore.select(selectGitHubList)});
   }
 

@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, Optional } from '@angular/core';
 import { Router } from '@angular/router';
-import {interval, animationFrameScheduler, ConnectableObservable, pipe, merge, Observable, Subject} from 'rxjs';
+import {interval, iif, animationFrameScheduler, ConnectableObservable, pipe, merge, Observable, Subject} from 'rxjs';
 import {endWith, shareReplay,observeOn, map,distinctUntilChanged, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
 
 @Injectable({
@@ -51,14 +51,21 @@ export class ComponentStateService implements OnDestroy {
     this.onDestroy$.subscribe(_ => subscription.unsubscribe());
   }
 
-  connectSlices(config: { [key: string]: Observable<any> }): void {
+  connectSlices(slices: { [key: string]: Observable<any> }, config): void {
     // @TODO validation / typing params
     // @TODO consider multiple observables for the same key. Here I would suggest last one wins => switchAll
-    Object.entries(config)
-      .map(([slice, state$]) => state$.pipe(
-        map(state => ({[slice]: state})),
-        endWith({[slice]: undefined})
-      )
+    Object.entries(slices)
+      .map(([slice, state$]) => {
+
+        const normal$ = state$
+        .pipe(map(state => ({[slice]: state})));
+
+        return iif(
+          () => config && 'endWith' in config, 
+            normal$.pipe(endWith({[slice]: undefined})),
+            normal$
+        )
+      }
     )
       .forEach(slice$ =>  this.commandObservable$$.next(slice$));
   }
