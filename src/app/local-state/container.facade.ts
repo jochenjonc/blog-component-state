@@ -20,15 +20,15 @@ export class ContainerFacade extends ComponentStateService {
     map(([list, selectedItems]) => ({ list, selectedItems }) )
   );
 
-  constructor(private store: Store<any>) {
+  constructor(private ngRxStore: Store<any>) {
     super();
 
-    this.connectSlices({list$: this.store.select(selectGitHubList)});
+    this.connectSlices({list$: this.ngRxStore.select(selectGitHubList)});
   }
 
   serverUpdateOn(o) {
     this.connectEffects([
-      o.pipe(tap(_ => this.store.dispatch(loadList())))
+      o.pipe(tap(_ => this.ngRxStore.dispatch(loadList())))
     ]);
   }
 

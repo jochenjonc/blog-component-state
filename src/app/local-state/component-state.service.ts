@@ -54,7 +54,7 @@ export class ComponentStateService implements OnDestroy {
   select(selector) {
     return this.state$
       .pipe(
-        selector,
+        selectSlice(selector),
         shareReplay(1)
       );
   }
