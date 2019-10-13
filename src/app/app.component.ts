@@ -12,6 +12,11 @@ import {HttpClient} from '@angular/common/http';
      <li>
      <a [routerLink]="['late-subscriber']">Late Subscriber</a>
     </li>
+    
+     <li>
+     <a [routerLink]="['subscription-handling']">Subscription Handling</a>
+    </li>
+    
     <li>
      <a [routerLink]="['local-state']">Local State</a>
     </li>
