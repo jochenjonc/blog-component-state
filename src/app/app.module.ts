@@ -23,7 +23,8 @@ import { TimingChildPipe } from './timing/timing.child.pipe';
 import { LateSubscribersContainerComponent } from './late-subscriber/late-subscriber.container.component';
 import { LateSubscriberDisplayComponent } from './late-subscriber/late-subscriber.display.component';
 
-import { SubscriptionHandligComponent } from './subscription-handlig/subscription-handlig.component';
+import { SubscriptionHandlingComponent } from './subscription-handling/subscription-handling.component';
+import { SubscriptionHandlingBadComponent } from './subscription-handling/subscription-handling-bad.component';
 
 import { LocalStatePageComponent } from './local-state/local-state-page.component';
 import { LocalStateContainerComponent } from './local-state/local-state-container.component';
@@ -57,7 +58,7 @@ import { LocalStateListComponent } from './local-state/local-state-list.componen
     },
     {
       path: 'subscription-handling',
-      component: SubscriptionHandligComponent
+      component: SubscriptionHandlingComponent
     }
     ]) ],
   declarations: [ 
@@ -69,7 +70,7 @@ import { LocalStateListComponent } from './local-state/local-state-list.componen
     LateSubscribersContainerComponent,
     LateSubscriberDisplayComponent,
 
-    SubscriptionHandligComponent,
+    SubscriptionHandlingComponent, SubscriptionHandlingBadComponent,
 
     LocalStatePageComponent,  LocalStateContainerComponent, LocalStateListComponent
    ],

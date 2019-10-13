@@ -5,7 +5,7 @@ import { takeUntil} from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class ComponentStateService implements OnDestroy {
+export class SubscriptionHandlingService implements OnDestroy {
 
   onDestroy$ = new Subject();
 

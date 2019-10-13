@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {timer} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {SubscriptionHandlingService} from './subscription-handling.service';
 
 @Component({
@@ -10,8 +10,8 @@ import {SubscriptionHandlingService} from './subscription-handling.service';
   `,
   providers: [SubscriptionHandlingService]
 })
-export class LocalStatePageComponent {
-  sideEffect$ = timer(0, 10000);
+export class SubscriptionHandlingComponent {
+  sideEffect$ = timer(0, 1000).pipe(tap(console.log));
 
   constructor(private subHandles: SubscriptionHandlingService)  {
     this.subHandles.connect(this.sideEffect$)
