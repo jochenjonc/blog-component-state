@@ -9,6 +9,7 @@ import {isArray} from './utils';
   template: `
    <h3>Display only chart</h3>
    <form [formGroup]="form$ | async">
+   <button (click)="refreshClick.next($event)">Refresh</button>
     <ul>
       <li *ngFor="let item of (config$ | async)?.list">
       <label>
@@ -48,6 +49,9 @@ export class LocalStateListComponent {
       switchMap(f => f.valueChanges),
       map(obj => Object.entries(obj).filter(a => a[1]).map(a => a[0]+''))
     );
+
+  @Output()
+  refreshClick = new Subject();
 
  constructor(private fb: FormBuilder) {
 
