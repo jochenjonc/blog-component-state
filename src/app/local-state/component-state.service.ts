@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import {interval, iif, animationFrameScheduler, ConnectableObservable, pipe, merge, Observable, Subject} from 'rxjs';
 import {endWith, shareReplay,observeOn, map,distinctUntilChanged, mergeAll, publishReplay, scan, takeUntil, tap} from 'rxjs/operators';
 
+import {selectSlice} from './utils';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +22,7 @@ export class ComponentStateService implements OnDestroy {
     );
 
   private commandObservable$$ = new Subject();
-  state$: Observable<any> =
+  private state$: Observable<any> =
     this.commandObservable$$
       .pipe(
         mergeAll(),
@@ -49,6 +51,10 @@ export class ComponentStateService implements OnDestroy {
     subscription.add((this.effect$ as ConnectableObservable<any>).connect());
 
     this.onDestroy$.subscribe(_ => subscription.unsubscribe());
+  }
+
+  select(selector: any): Observable<any> {
+      return this.state$.pipe(selectSlice(selector));
   }
 
   connectSlices(slices: { [key: string]: Observable<any> }, config): void {
@@ -83,13 +89,4 @@ export class ComponentStateService implements OnDestroy {
     this.onDestroy$.next(true);
   }
 
-}
-
-export function selectSlice<T>(mapToSliceFn: (s: any) => any) {
-  return pipe(
-    map(s => {
-      return (s !== undefined) ? mapToSliceFn(s) : s;
-    }),
-    distinctUntilChanged<T>()
-  );
 }

@@ -1,12 +1,12 @@
 import {ChangeDetectionStrategy, Input,Output, Component} from '@angular/core';
 import {FormGroup, FormBuilder} from '@angular/forms'
-import {Subject, Observable} from 'rxjs';
+import {Subject, Observable, interval} from 'rxjs';
 import {shareReplay, map, filter, tap, startWith, switchMap} from 'rxjs/operators';
+import {isArray} from './utils';
 
 @Component({
   selector: 'local-state-chart',
   template: `
-  {{(form$ | async).value | json}}
    <h3>Display only chart</h3>
    <form [formGroup]="form$ | async">
     <ul>
@@ -26,13 +26,18 @@ export class LocalStateListComponent {
   config$ = new Subject<any[]>(); 
   @Input()
   set config(cfg) {
-    this.config$.next(cfg || {});
+    // @TODO how to deal with all the checks here??
+    if(cfg && 
+    'list' in cfg && isArray(cfg.list) &&
+    'selectedItems' in cfg && isArray(cfg.selectedItems)) {
+      this.config$.next(cfg); 
+    }
   }
   
+
   form$: Observable<FormGroup> = this.config$
     .pipe(
       map(cfg => this.selectFormConfig(cfg)),
-      startWith({}),
       map(fCfg => this.fb.group(fCfg)),
       shareReplay(1)
     );
@@ -41,8 +46,7 @@ export class LocalStateListComponent {
  selectedItemsChange = this.form$
     .pipe(
       switchMap(f => f.valueChanges),
-      map(obj => Object.entries(obj).filter(a => a[1]).map(a => a[0])),
-            tap(console.log)
+      map(obj => Object.entries(obj).filter(a => a[1]).map(a => a[0]+''))
     );
 
  constructor(private fb: FormBuilder) {
@@ -50,11 +54,9 @@ export class LocalStateListComponent {
  }
 
   selectFormConfig(cfg): any {
-   console.log('cfg', cfg);
-    if('list' in cfg && 'selectedItems' in cfg) {
+    // @TODO where to put the ugly string cast?
       return cfg.list
-        .reduce((acc, i) => ({...acc, [i.id]: !!(cfg.selectedItems.indexOf(i.id) !== -1)}), {})
-    }
+        .reduce((acc, i) => ({...acc, [i.id+'']: !!(cfg.selectedItems.indexOf(i.id+'') !== -1)}), {})
   }
 
 }
