@@ -1,6 +1,6 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {animationFrameScheduler, ConnectableObservable, iif, Observable, OperatorFunction, Subject} from 'rxjs';
-import {distinctUntilChanged, endWith, map, mergeAll, observeOn, publishReplay, scan, takeUntil} from 'rxjs/operators';
+import {animationFrameScheduler, ConnectableObservable, Observable, OperatorFunction, Subject} from 'rxjs';
+import {distinctUntilChanged, map, mergeAll, observeOn, publishReplay, scan, takeUntil} from 'rxjs/operators';
 
 export interface SliceConfig {
     starWith?: any,
@@ -64,20 +64,12 @@ export class ComponentStateService implements OnDestroy {
         );
     }
 
-    connectSlices<T>(slices: { [key: string]: Observable<T> }, config?: SliceConfig): void {
+    connectSlices<T>(slices: { [key: string]: Observable<T> }): void {
         // @TODO validation / typing params
         // @TODO consider multiple observables for the same key. Here I would suggest last one wins => switchAll
         Object.entries(slices)
-            .map(([slice, state$]) => {
-                    const default$ = state$
-                        .pipe(map(state => ({[slice]: state})));
-                    // @TODO implement proper usage of SliceConfig
-                    return iif(
-                        () => config && 'endWith' in config,
-                        default$.pipe(endWith({[slice]: undefined})),
-                        default$
-                    );
-                }
+            .map(([slice, state$]) => state$
+                .pipe(map(state => ({[slice]: state})))
             )
             .forEach(slice$ => this.commandObservable$$.next(slice$));
     }
@@ -87,7 +79,7 @@ export class ComponentStateService implements OnDestroy {
         // @TODO validation / typing params
         Object.entries(effects)
             .map(([name, effect$]) => effect$)
-                //.pipe(map(state => ({[name]: state})))
+            //.pipe(map(state => ({[name]: state})))
             .forEach(effect$ => this.effectObservable$$.next(effect$));
     }
 

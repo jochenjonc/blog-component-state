@@ -1,18 +1,18 @@
 import {Component, Input} from '@angular/core';
-import {merge, of, ReplaySubject} from 'rxjs';
-import {scan, tap} from 'rxjs/operators';
+import {ConnectableObservable, merge, of, ReplaySubject, Subject} from 'rxjs';
+import {publish, publishReplay, scan, tap} from 'rxjs/operators';
 
 @Component({
     selector: 'cold-composition',
     template: `
         <h1>Cold Composition</h1>
-        composed$: {{composed$ | async}}
+        composed$: {{composed$ | async | json}}
     `
 })
 export class ColdCompositionComponent {
-    tick$ = of(0).pipe();
+    tick$ = of({tick: 1}, {tick: 2}, {tick: 3}).pipe();
 
-    inputValue$ = new ReplaySubject(1);
+    inputValue$ = new Subject();
 
     @Input()
     set inputValue(value) {
@@ -23,12 +23,15 @@ export class ColdCompositionComponent {
     composed$ = merge(this.inputValue$, this.tick$)
         .pipe(
             tap(console.log),
-            scan((acc, i) => acc + i, 0),
-            // publish()
+            scan((acc, i) => {
+                const [key, value] = Object.entries(i)[0];
+                return ({...acc, [key]: (acc[key] || 0)+value})
+            }, {}),
+            publishReplay()
         );
 
     constructor() {
-        // (this.composed$ as ConnectableObservable<any>).connect();
+        (this.composed$ as ConnectableObservable<any>).connect();
     }
 
 }

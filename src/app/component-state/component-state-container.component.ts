@@ -1,19 +1,17 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {merge, Subject, timer} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {concat, merge, of, Subject, timer} from 'rxjs';
+import {catchError, switchMap} from 'rxjs/operators';
 import {ContainerFacade} from './container.facade';
 
 @Component({
     selector: 'local-state-container',
     template: `
         <h2>Container</h2>
-        listConfig$: {{listConfig$ | async | json}}
-        Refresh every: {{(refreshClick$ | async) / 1000}} seconds
+        Refresh every: {{inputValue$ | async}} milliseconds<br/>
         <local-state-chart
                 [config]="listConfig$ | async"
                 (selectedItemIdsChange)="selectedItemIdsChange$.next($event)"
-                (refreshClick)="refreshClick$.next($event)"
-        >
+                (refreshClick)="refreshClick$.next($event)">
         </local-state-chart>
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,7 +23,6 @@ export class ComponentStateContainerComponent {
 
     @Input()
     set inputValue(ms: number) {
-        console.log('ms', ms);
         this.inputValue$.next(Number.isInteger(ms) ? ms : 10000);
     }
 
@@ -33,8 +30,21 @@ export class ComponentStateContainerComponent {
     selectedItemIdsChange$ = new Subject<string[]>();
 
     constructor(private facade: ContainerFacade) {
-        this.facade.connectSlices({refreshMs: this.inputValue$});
-        this.facade.connectSlices({selectedItemIds: this.selectedItemIdsChange$});
+        this.facade.connectSlices({
+            refreshMs:
+                // @TODO move this setup into a config obj?
+                concat(
+                    // initial state
+                    of([]),
+                    // state changes
+                    this.inputValue$,
+                    // state after completion
+                    of(undefined),
+                    // state after error
+                    catchError(e => of(undefined))
+                )
+        });
+        this.facade.connectSlices({selectedItemIds: concat(of([]), this.selectedItemIdsChange$)});
 
         this.facade.serverUpdateOn(
             merge(

@@ -13,15 +13,14 @@ export interface ListConfig {
 @Component({
     selector: 'local-state-chart',
     template: `
-        <h3>Display only chart</h3>
-        config$: {{config$ | async | json}}
+        <h3>Display-Only List Component</h3>
         <button (click)="refreshClick.next($event)">Refresh</button>
         <form *ngIf="form$ | async as form; else noList" [formGroup]="form">
             <ul>
                 <li *ngFor="let item of (config$ | async)?.list">
                     <label>
                         <input type="checkbox" [formControlName]="item.id">
-                        {{item.name}}
+                        {{item.id}}:{{item.name}}
                     </label>
                 </li>
             </ul>
@@ -65,10 +64,10 @@ export class ComponentStateListComponent {
         }
     }
 
-    getFormGroupFromConfig(cfg): FormGroup {
+    getFormGroupFromConfig(cfg: ListConfig): FormGroup {
         return this.fb.group(
             cfg.list
-            .reduce((acc, i) => ({...acc, [i.id]: cfg.selectedItems.indexOf(i.id) !== -1}), {})
+            .reduce((acc, i) => ({...acc, [i.id]: cfg.selectedItemIds.indexOf(i.id) !== -1}), {})
         )
     }
 
