@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {ReplaySubject} from 'rxjs';
-import {tap} from "rxjs/operators";
+import {scan, tap} from "rxjs/operators";
 
 @Component({
     selector: 'cold-composition-bad',
@@ -11,14 +11,16 @@ import {tap} from "rxjs/operators";
 })
 export class ColdCompositionBadComponent {
 
-    inputValue$ = new ReplaySubject(1);
+    inputValue$ = new ReplaySubject<number>(1);
     composed$ = this.inputValue$
         .pipe(
-            tap(console.log)
+            tap(console.log),
+            scan((acc, i) => acc + i, 0)
         );
 
     @Input()
     set inputValue(value) {
+        console.log('input value', value);
         this.inputValue$.next(value);
     }
 

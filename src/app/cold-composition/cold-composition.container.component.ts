@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {timer} from 'rxjs';
+import {of, timer} from 'rxjs';
 
 @Component({
     selector: 'cold-composition-container',
@@ -10,5 +10,5 @@ import {timer} from 'rxjs';
     `
 })
 export class ColdCompositionContainerComponent {
-    tick$ = timer(0, 200);
+    tick$ = of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 }

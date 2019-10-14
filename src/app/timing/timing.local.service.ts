@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {interval, merge, Subject} from 'rxjs';
+import {interval, merge, Subject, Subscription} from 'rxjs';
 import {mergeAll, publishReplay, scan, startWith, take, tap} from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
 export class TimingLocalService {
-    sub;
+    sub = new Subscription();
     _initialState = 0;
     private states$ = new Subject();
 

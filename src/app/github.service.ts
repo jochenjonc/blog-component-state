@@ -11,14 +11,10 @@ export class GitHubService {
 
     }
 
-    getData(arg) {
-        return of([
-            {id: 1, name: 'one'},
-            {id: 2, name: 'two'},
-            {id: 3, name: 'three'},
-            {id: 4, name: 'four'},
-            {id: ~~(Math.random() * 10), name: 'random' + ~~(Math.random() * 10)}
-        ])
+    getData(arg?:string) {
+        const randId= (s: string) => s+'-'+~~(Math.random() * 10);
+        return of(new Array(5)
+            .map(_ => ({id: randId('id'), name: randId('name')})))
     }
 
 }

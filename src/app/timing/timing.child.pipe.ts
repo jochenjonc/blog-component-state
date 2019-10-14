@@ -10,7 +10,7 @@ export class TimingChildPipe implements PipeTransform, OnDestroy {
         console.log('ChildPipe Constructor');
     }
 
-    transform(value, args): any {
+    transform(value, args?): any {
         console.log('ChildPipe transform', value);
         return value;
     }

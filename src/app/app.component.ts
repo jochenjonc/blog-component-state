@@ -1,8 +1,7 @@
 import {Component} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 
 @Component({
-    selector: 'my-app',
+    selector: 'app-root',
     template: `
         <ul>
             <li>
@@ -21,7 +20,7 @@ import {HttpClient} from '@angular/common/http';
             </li>
 
             <li>
-                <a [routerLink]="['local-state']">Local State</a>
+                <a [routerLink]="['component-state']">Component State</a>
             </li>
         </ul>
         <router-outlet></router-outlet>
@@ -29,8 +28,7 @@ import {HttpClient} from '@angular/common/http';
 })
 export class AppComponent {
 
-    constructor(http: HttpClient) {
-        http.get('https://api.github.com/users/BioPhoton').subscribe(console.log);
+    constructor() {
         console.log('AppComponent Constructor');
     }
 

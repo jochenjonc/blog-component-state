@@ -1,13 +1,11 @@
 import {Directive, Input, OnChanges, OnDestroy, OnInit} from '@angular/core';
-import {TimingLocalService} from './timing.local.service';
 
 @Directive({
-    selector: '[timing-child-dir]',
-    providers: [TimingLocalService]
+    selector: '[timing-child-dir]'
 })
 export class TimingChildDirective implements OnChanges, OnInit, OnDestroy {
 
-    constructor(private localService: TimingLocalService) {
+    constructor() {
         console.log('ChildDirective Constructor');
     }
 
