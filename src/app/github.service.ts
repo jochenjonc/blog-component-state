@@ -12,8 +12,9 @@ export class GitHubService {
     }
 
     getData(arg?:string) {
-        const randId= (s: string) => s+'-'+~~(Math.random() * 10);
+        const randId = (s: string) => s+'-'+~~(Math.random() * 10);
         return of(new Array(5)
+            .fill(5)
             .map(_ => ({id: randId('id'), name: randId('name')})))
     }
 

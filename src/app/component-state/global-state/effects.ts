@@ -4,7 +4,7 @@ import {listLoadedError, listLoadedSuccess, loadList} from './actions';
 
 import {GitHubService} from '../../github.service';
 import {of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, map, switchMap, tap} from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -15,10 +15,12 @@ export class GlobalEffects {
         this.actions$.pipe(
             ofType(loadList.type),
             switchMap(action =>
-              this.gitHubService.getData(action).pipe(
+                this.gitHubService.getData(action).pipe(
+                    tap(v => console.log(action.type, ' action triggered effect:', action)),
                     map(list => listLoadedSuccess({list})),
+                    tap(v => console.log(v.type, ' created:', v)),
                     catchError(error => of(listLoadedError({error})))
-               )
+                )
             )
         )
     );

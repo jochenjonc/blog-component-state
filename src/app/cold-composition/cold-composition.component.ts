@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {ConnectableObservable, interval, merge, of, ReplaySubject} from 'rxjs';
-import {publish, scan, share, tap} from 'rxjs/operators';
+import {merge, of, ReplaySubject} from 'rxjs';
+import {scan, tap} from 'rxjs/operators';
 
 @Component({
     selector: 'cold-composition',
@@ -10,13 +10,13 @@ import {publish, scan, share, tap} from 'rxjs/operators';
     `
 })
 export class ColdCompositionComponent {
-    tick$ = of().pipe();
+    tick$ = of(0).pipe();
 
     inputValue$ = new ReplaySubject(1);
 
     @Input()
     set inputValue(value) {
-        console.log('Input value', value);
+        console.log('input value', value);
         this.inputValue$.next(value);
     }
 
@@ -24,11 +24,11 @@ export class ColdCompositionComponent {
         .pipe(
             tap(console.log),
             scan((acc, i) => acc + i, 0),
-       //   publish()
+            // publish()
         );
 
     constructor() {
-       // (this.composed$ as ConnectableObservable<any>).connect();
+        // (this.composed$ as ConnectableObservable<any>).connect();
     }
 
 }

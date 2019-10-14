@@ -8,10 +8,11 @@ import {selectGitHubList} from './global-state/selectors';
 import {Item} from "./global-state/item.interface";
 
 export interface ComponentState {
-    selectedItems?: string[];
+    selectedItemIds?: string[];
     list?: Item[];
     refreshMs?: number;
-    [key: string]: any
+    // @TODO how to deal with dynamic state structures?
+    // [key: string]: any
 }
 
 @Injectable({
@@ -21,16 +22,17 @@ export class ContainerFacade extends ComponentStateService {
 
     // @TODO move default values somewhere else
     list$ = this.select(map((s: ComponentState) => s.list));
-    selectedItems$ = this.select(map((s: ComponentState) => s.selectedItems));
+    selectedItemIds$ = this.select(map((s: ComponentState) => s.selectedItemIds));
     refreshMs$ = this.select(map((s: ComponentState) => s.refreshMs));
 
-    listConfig$ = combineLatest(this.list$, this.selectedItems$)
+    listConfig$ = combineLatest(this.list$, this.selectedItemIds$)
         .pipe(
-            map(([list, selectedItems]) => ({list, selectedItems}) )
+            map(([list, selectedItemIds]) => ({list, selectedItemIds}) )
         );
 
     constructor(private ngRxStore: Store<any>) {
         super();
+        this.ngRxStore.select(selectGitHubList).subscribe(console.log);
         this.connectSlices({list: this.ngRxStore.select(selectGitHubList)});
     }
 

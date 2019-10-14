@@ -20,7 +20,6 @@ export class ColdCompositionBadComponent {
 
     @Input()
     set inputValue(value) {
-        console.log('input value', value);
         this.inputValue$.next(value);
     }
 
