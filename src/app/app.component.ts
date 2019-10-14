@@ -30,7 +30,7 @@ import {HttpClient} from '@angular/common/http';
 export class AppComponent {
 
     constructor(http: HttpClient) {
-        http.get('https://api.github.com/users/BioPhoton').subscribe(console.log)
+        http.get('https://api.github.com/users/BioPhoton').subscribe(console.log);
         console.log('AppComponent Constructor');
     }
 

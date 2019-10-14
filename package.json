@@ -11,7 +11,7 @@
     "@angular/platform-browser-dynamic": "8.2.10",
     "@angular/router": "8.2.10",
     "@ngrx/effects": "^8.4.0",
-    "@ngrx/store": "8.3.0",
+    "@ngrx/store": "8.4.0",
     "core-js": "^3.2.1",
     "rxjs": "6.5.3",
     "rxjs-etc": "^9.6.2",

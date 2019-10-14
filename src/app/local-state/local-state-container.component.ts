@@ -6,13 +6,13 @@ import {ContainerFacade} from './container.facade';
 @Component({
     selector: 'local-state-container',
     template: `
-   <h2>Container</h2>
-  <local-state-chart 
-  [config]="listConfig$ | async"
-  (selectedItemsChange)="selectedItemsChange$.next($event)"
-  (refreshClick)="refreshClick$.next($event)"
-  ></local-state-chart>
-  `,
+        <h2>Container</h2>
+        <local-state-chart
+                [config]="listConfig$ | async"
+                (selectedItemsChange)="selectedItemsChange$.next($event)"
+                (refreshClick)="refreshClick$.next($event)"
+        ></local-state-chart>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LocalStateContainerComponent {
