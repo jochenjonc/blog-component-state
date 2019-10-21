@@ -33,6 +33,7 @@
     "@types/node": "~8.9.4",
     "ts-node": "~8.3.0",
     "tslint": "~5.18.0",
-    "typescript": "~3.5.3"
+    "typescript": "~3.5.3",
+    "webpack-dashboard": "^3.2.0"
   }
 }

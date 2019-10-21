@@ -22,6 +22,9 @@ import {Component} from '@angular/core';
             <li>
                 <a [routerLink]="['component-state']">Component State</a>
             </li>
+            <li>
+                <a [routerLink]="['process-override-slice']">Process Override Slice</a>
+            </li>
         </ul>
         <router-outlet></router-outlet>
     `

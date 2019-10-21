@@ -8,7 +8,9 @@ export const ROUTES = [
     component: SubscriptionHandlingComponent
   }
 ];
-const DECLARATIONS = [SubscriptionHandlingComponent, SubscriptionHandlingComponent];
+const DECLARATIONS = [
+    SubscriptionHandlingComponent, SubscriptionHandlingComponent
+];
 @NgModule({
   declarations: [DECLARATIONS],
   imports: [

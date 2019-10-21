@@ -17,7 +17,7 @@ export interface ListConfig {
         <button (click)="refreshClick.next($event)">Refresh</button>
         <form *ngIf="form$ | async as form; else noList" [formGroup]="form">
             <ul>
-                <li *ngFor="let item of (config$ | async)?.list">
+                <li *ngFor="let item of (config$ | async)?.list; trackBy:getId">
                     <label>
                         <input type="checkbox" [formControlName]="item.id">
                         {{item.id}}:{{item.name}}
@@ -69,6 +69,11 @@ export class ComponentStateListComponent {
             cfg.list
             .reduce((acc, i) => ({...acc, [i.id]: cfg.selectedItemIds.indexOf(i.id) !== -1}), {})
         )
+    }
+
+    // @TODO maybe get rid of it for the sake of less code?
+    getId(item) {
+        return item.id
     }
 
 }

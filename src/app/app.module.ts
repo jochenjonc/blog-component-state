@@ -24,9 +24,9 @@ import {TimingModule} from "./timing/timing.module";
         }),
         EffectsModule.forRoot([GlobalEffects]),
         TimingModule,
-        //ColdCompositionModule,
-        //LateSubscriberModule,
-        //SubscriptionHandlingModule,
+        ColdCompositionModule,
+        LateSubscriberModule,
+        SubscriptionHandlingModule,
         RouterModule.forRoot(ROUTES)
     ],
     declarations: [

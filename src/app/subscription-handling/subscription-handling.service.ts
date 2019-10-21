@@ -9,12 +9,8 @@ export class SubscriptionHandlingService implements OnDestroy {
 
     onDestroy$ = new Subject();
 
-    constructor() {
-    }
-
-    connect(o) {
-        o
-            .pipe(takeUntil(this.onDestroy$))
+    subscribe(o) {
+        o.pipe(takeUntil(this.onDestroy$))
             .subscribe();
     }
 

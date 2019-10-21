@@ -6,14 +6,16 @@ import {SubscriptionHandlingService} from './subscription-handling.service';
 @Component({
     selector: 'subscription-handling',
     template: `
-   <h1>Subscription Handling</h1>
-  `,
+       <h1>Subscription Handling</h1>
+    `,
     providers: [SubscriptionHandlingService]
 })
 export class SubscriptionHandlingComponent {
-    sideEffect$ = timer(0, 1000).pipe(tap(console.log));
+    sideEffect$ = timer(0, 1000)
+        .pipe(tap(console.log));
 
     constructor(private subHandles: SubscriptionHandlingService) {
-        this.subHandles.connect(this.sideEffect$)
+        this.subHandles
+            .subscribe(this.sideEffect$)
     }
 }

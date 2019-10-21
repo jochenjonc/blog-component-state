@@ -3,6 +3,7 @@ import {ROUTES as LATE_SUBSCRIBER_ROUTES} from "./late-subscriber/late-subscribe
 import {ROUTES as COMPONENT_STATE_ROUTES} from "./component-state/component-state.module";
 import {ROUTES as TIMING_ROUTES} from "./timing/timing.module";
 import {ROUTES as SUBSCRIPTION_HANDLING_ROUTES} from "./subscription-handling/subscription-handling.module";
+import {ROUTES as PROCESS_OVERRIDE_SLICE_ROUTES} from "./process-override-slice/process-override-slice.module";
 
 export const ROUTES = [
     {
@@ -14,5 +15,6 @@ export const ROUTES = [
     {path: 'subscription-handling', children: SUBSCRIPTION_HANDLING_ROUTES},
     {path: 'late-subscriber', children: LATE_SUBSCRIBER_ROUTES},
     {path: 'cold-composition', children: COLD_COMPOSITION_ROUTES},
+    {path: 'process-override-slice', children: PROCESS_OVERRIDE_SLICE_ROUTES},
     {path: 'component-state', children: COMPONENT_STATE_ROUTES}
 ];

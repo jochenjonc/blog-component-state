@@ -1,32 +1,49 @@
 import {Component, Input} from '@angular/core';
 import {merge, of, ReplaySubject} from 'rxjs';
-import {scan, tap} from "rxjs/operators";
+import {scan, tap, map} from "rxjs/operators";
 
 @Component({
     selector: 'cold-composition-bad',
     template: `
         <h1>Cold Composition Bad</h1>
+        {{asyncPipeFired$ | async}}
         composed$: {{composed$ | async | json}}
     `
 })
 export class ColdCompositionBadComponent {
-    tick$ = of({tick: 1}, {tick: 2}, {tick: 3}).pipe();
+    asyncPipeFired$ = of('BAD async pipe fired').pipe(tap(console.log));
+
 
     inputValue$ = new ReplaySubject<number>(1);
-
     @Input()
     set inputValue(value) {
+        console.log('set inputValue', value);
         this.inputValue$.next(value);
     }
 
-    composed$ = merge(this.inputValue$, this.tick$)
+    otherInputValue$ = new ReplaySubject<number>(1);
+    @Input()
+    set otherInputValue(value) {
+        console.log('set otherInputValue', value);
+        this.otherInputValue$.next(value);
+    }
+
+    composed$ = merge(
+        this.inputValue$
+            .pipe(map(v => ({inputValue: v}))),
+        this.otherInputValue$
+            .pipe(map(v => ({otherInputValue: v}))),
+    )
         .pipe(
-            tap(console.log),
             scan((acc, i) => {
+                console.log('acc', acc,'i', i);
                 const [key, value] = Object.entries(i)[0];
                 return ({...acc, [key]: (acc[key] || 0)+value});
             }, {})
         );
 
+    constructor() {
+        console.log('CTOR BAD', );
+    }
 
 }
