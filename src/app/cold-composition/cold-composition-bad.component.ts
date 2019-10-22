@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {merge, of, ReplaySubject} from 'rxjs';
 import {scan, tap, map} from "rxjs/operators";
+import {SomeService} from "./some.service";
 
 @Component({
     selector: 'cold-composition-bad',
@@ -29,10 +30,12 @@ export class ColdCompositionBadComponent {
     }
 
     composed$ = merge(
+        this.service.value$
+            .pipe(map(v => ({sum: v}))),
         this.inputValue$
-            .pipe(map(v => ({inputValue: v}))),
+            .pipe(map(v => ({sum: v}))),
         this.otherInputValue$
-            .pipe(map(v => ({otherInputValue: v}))),
+            .pipe(map(v => ({sum: v}))),
     )
         .pipe(
             scan((acc, i) => {
@@ -42,7 +45,7 @@ export class ColdCompositionBadComponent {
             }, {})
         );
 
-    constructor() {
+    constructor(private service:SomeService) {
         console.log('CTOR BAD', );
     }
 
