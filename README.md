@@ -139,6 +139,8 @@ In this way we get rid of thinking about subscriptions in the component at all.
 
 # The Late Subscriber Problem
 
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/late-subscriber__michael-hladky.png "Late Subscriber")
+
 Incoming values arrive before the subscription has happened.
 
 For example state over `@Input()` decorators arrives before the view gets rendered and a used pipe could receive the value.
