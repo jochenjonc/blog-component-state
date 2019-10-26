@@ -1,5 +1,20 @@
 # Problems in when managing component state with Angular
 
+<!-- toc -->
+
+- [Timing](#timing)
+- [Subscription Handling](#subscription-handling)
+- [The Late Subscriber Problem](#the-late-subscriber-problem)
+- [Sharing references (SHOULD NOT BE SOLVE BY COMPONENT STATE)](#sharing-references-should-not-be-solve-by-component-state)
+- [The Cold Composition Problem](#the-cold-composition-problem)
+- [Imperative Interaction with Component StateManagement](#imperative-interaction-with-component-statemanagement)
+- [Recap](#recap)
+- [Dynamic Component State and Reactive Context](#dynamic-component-state-and-reactive-context)
+  * [Initialisation and Cleanup](#initialisation-and-cleanup)
+  * [Overriding State Changes and Effects](#overriding-state-changes-and-effects)
+
+<!-- tocstop -->
+
 # Timing
 
 As a lot of problems I ran into while my consulting are related to timing issues, 
