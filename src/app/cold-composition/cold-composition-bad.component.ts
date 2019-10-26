@@ -1,52 +1,41 @@
-import {Component, Input} from '@angular/core';
-import {merge, of, ReplaySubject} from 'rxjs';
-import {scan, tap, map} from "rxjs/operators";
-import {SomeService} from "./some.service";
+import {Component, Input, OnDestroy} from '@angular/core';
+import {of, ReplaySubject, Subject} from 'rxjs';
+import {map, tap} from "rxjs/operators";
+import {SomeBadService} from "./some-bad.service";
 
 @Component({
     selector: 'cold-composition-bad',
     template: `
         <h1>Cold Composition Bad</h1>
-        {{asyncPipeFired$ | async}}
-        composed$: {{composed$ | async | json}}
-    `
+        {{asyncPipeFired$ | async }}
+        someService.composedState$: {{someBadService.composedState$ | async | json}}
+    `,
+    providers: [SomeBadService]
 })
-export class ColdCompositionBadComponent {
-    asyncPipeFired$ = of('BAD async pipe fired').pipe(tap(console.log));
+export class ColdCompositionBadComponent implements OnDestroy {
+    asyncPipeFired$ = of(' ').pipe(tap(_ => console.log('CC-Bad async pipe fired')));
 
-
-    inputValue$ = new ReplaySubject<number>(1);
+    inputValue$ = new Subject<number>();
     @Input()
     set inputValue(value) {
-        console.log('set inputValue', value);
+        console.log('set CC-Bad inputValue', value);
         this.inputValue$.next(value);
     }
 
-    otherInputValue$ = new ReplaySubject<number>(1);
-    @Input()
-    set otherInputValue(value) {
-        console.log('set otherInputValue', value);
-        this.otherInputValue$.next(value);
+    constructor(public someBadService: SomeBadService) {
+        console.log('CTOR CC-Bad');
+        // earliest possible moment to forward values
+        this.inputValue$
+            .pipe(map(n => ({sum: n})))
+            .subscribe(
+                n => this.someBadService.commands$.next(n)
+            );
+        // earliest possible moment to subscribe to a service
+        this.someBadService.composedState$.subscribe(s => console.log('composedState bad: ', s) );
     }
 
-    composed$ = merge(
-        this.service.value$
-            .pipe(map(v => ({sum: v}))),
-        this.inputValue$
-            .pipe(map(v => ({sum: v}))),
-        this.otherInputValue$
-            .pipe(map(v => ({sum: v}))),
-    )
-        .pipe(
-            scan((acc, i) => {
-                console.log('acc', acc,'i', i);
-                const [key, value] = Object.entries(i)[0];
-                return ({...acc, [key]: (acc[key] || 0)+value});
-            }, {})
-        );
-
-    constructor(private service:SomeService) {
-        console.log('CTOR BAD', );
+    ngOnDestroy(): void {
+        this.inputValue$.complete()
     }
 
 }

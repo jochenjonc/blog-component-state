@@ -14,6 +14,8 @@ import {listReducer} from "./component-state/global-state/reducer";
 import {GlobalEffects} from "./component-state/global-state/effects";
 import {ROUTES} from "./app.routes";
 import {TimingModule} from "./timing/timing.module";
+import {DeclarativeInteractionModule} from "./declarative-interaction/declarative-interaction.module";
+import {LowLevelComponentStateModule} from "./low-level-component-state/low-level-component-state.module";
 
 @NgModule({
     imports: [
@@ -23,10 +25,14 @@ import {TimingModule} from "./timing/timing.module";
                 (state: any | undefined, action: any) => listReducer(state, action)
         }),
         EffectsModule.forRoot([GlobalEffects]),
+
         TimingModule,
         ColdCompositionModule,
         LateSubscriberModule,
         SubscriptionHandlingModule,
+        DeclarativeInteractionModule,
+        LowLevelComponentStateModule,
+
         RouterModule.forRoot(ROUTES)
     ],
     declarations: [

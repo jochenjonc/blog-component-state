@@ -1,38 +1,43 @@
 import {Component, Input} from '@angular/core';
-import {ConnectableObservable, merge, of, ReplaySubject, Subject} from 'rxjs';
-import {map, publish, publishReplay, scan, tap} from 'rxjs/operators';
+import {of, ReplaySubject} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
+import {SomeGoodService} from "./some-good.service";
 
 @Component({
     selector: 'cold-composition',
     template: `
-        <h1>Cold Composition</h1>
-        composed$: {{composed$ | async | json}}
-    `
+        {{asyncPipeFired$ | async}}
+        <h1>Cold Composition Good</h1>
+        composed$: {{someGoodService.composedState$ | async | json}}
+    `,
+    providers: [SomeGoodService]
 })
 export class ColdCompositionComponent {
+    asyncPipeFired$ = of(' ').pipe(tap(_ => console.log('CC-Good async pipe fired')));
 
-    inputValue$ = new Subject();
+    inputValue$ = new ReplaySubject<number>(1);
     @Input()
     set inputValue(value) {
-        console.log('inputValue:: value', value);
+        console.log('set CC-Bad inputValue', value);
         this.inputValue$.next(value);
     }
 
-    composed$ = merge(
+    constructor(public someGoodService: SomeGoodService) {
+        console.log('CTOR CC-Bad');
+        // earliest possible moment to forward values
         this.inputValue$
-            .pipe(map(v => ({inputValue: v})))
-        )
-        .pipe(
-            tap(v => console.log('tttt', v)),
-            scan((acc, i) => {
-                const [key, value] = Object.entries(i)[0];
-                return ({...acc, [key]: (acc[key] || 0)+value})
-            }, {}),
-            publishReplay(1)
-        );
-
-    constructor() {
-        (this.composed$ as ConnectableObservable<any>).connect();
+            .pipe(map(n => ({sum: n})))
+            .subscribe(
+                n => this.someGoodService.commands$.next(n)
+            );
+        // earliest possible moment to subscribe to a service
+        this.someGoodService.composedState$.subscribe(s => console.log('composedState good: ', s) );
     }
+
+
+    ngOnDestroy(): void {
+        this.inputValue$.complete()
+    }
+
 
 }

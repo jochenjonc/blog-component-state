@@ -25,6 +25,15 @@ import {Component} from '@angular/core';
             <li>
                 <a [routerLink]="['process-override-slice']">Process Override Slice</a>
             </li>
+            <li>
+                <a [routerLink]="['sharing-a-reference']">Sharing A Reference</a>
+            </li>
+            <li>
+                <a [routerLink]="['declarative-interaction']">Declarative Interaction</a>
+            </li>
+            <li>
+                <a [routerLink]="['low-level-component-state']">Low Level Component State</a>
+            </li>
         </ul>
         <router-outlet></router-outlet>
     `

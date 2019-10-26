@@ -8,14 +8,13 @@ import {take, tap} from "rxjs/operators";
         <h1>Cold Composition</h1>
         {{asyncPipeFired$ | async}}
         <cold-composition-bad 
-                [inputValue]="1"
-                [otherInputValue]="otherInputValue$ | async">
+                [inputValue]="inputValue$ | async">
         </cold-composition-bad>
-       <!-- <cold-composition [inputValue]="inputValue$ | async"></cold-composition> -->
+        <cold-composition [inputValue]="inputValue$ | async">
+        </cold-composition> 
     `
 })
 export class ColdCompositionContainerComponent {
     asyncPipeFired$ = of('CONTAINER async pipe fired').pipe(tap(console.log));
-    inputValue$ = interval(0).pipe(take(3));
-    otherInputValue$ = interval(0).pipe(take(3));
+    inputValue$ = timer(0, 1000)
 }

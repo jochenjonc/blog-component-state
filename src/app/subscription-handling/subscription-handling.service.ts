@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {Subject} from 'rxjs';
+import {ObservableLike, Subject, SubscriptionLike} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
 @Injectable({
@@ -9,7 +9,7 @@ export class SubscriptionHandlingService implements OnDestroy {
 
     onDestroy$ = new Subject();
 
-    subscribe(o) {
+    subscribe(o): void {
         o.pipe(takeUntil(this.onDestroy$))
             .subscribe();
     }
