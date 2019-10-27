@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {concat, merge, of, Subject, timer} from 'rxjs';
 import {catchError, switchMap} from 'rxjs/operators';
-import {ContainerFacade} from './container.facade';
+import {ContainerFacade} from './container/container.facade';
 
 @Component({
     selector: 'local-state-container',
@@ -16,7 +16,7 @@ import {ContainerFacade} from './container.facade';
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComponentStateContainerComponent {
+export class ReactiveComponentArchitectureContainerComponent {
 
     listConfig$ = this.facade.listConfig$;
     inputValue$ = new Subject<number>();

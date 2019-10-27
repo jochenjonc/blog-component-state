@@ -6,13 +6,14 @@ const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]:
 
 export class DeclarativeInteractionBadService implements OnDestroy {
     private stateSubscription = new Subscription();
+    private stateAccumulator = stateAccumulator;
 
     private stateSubject = new Subject<{ [key: string]: number }>();
     state$ = this.stateSubject
         .pipe(
             // process single state change
             map(obj => Object.entries(obj).pop()),
-            scan(stateAccumulator, {}),
+            scan(this.stateAccumulator, {}),
             publishReplay(1)
         ) as ConnectableObservable<any>;
 

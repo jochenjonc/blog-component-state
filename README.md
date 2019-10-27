@@ -5,7 +5,7 @@
 - [Timing](#timing)
 - [Subscription Handling](#subscription-handling)
 - [The Late Subscriber Problem](#the-late-subscriber-problem)
-- [Sharing references (SHOULD NOT BE SOLVE BY COMPONENT STATE)](#sharing-references-should-not-be-solve-by-component-state)
+- [Sharing references (will not be solved by component-state)](#sharing-references-will-not-be-solved-by-component-state)
 - [The Cold Composition Problem](#the-cold-composition-problem)
 - [Imperative Interaction with Component StateManagement](#imperative-interaction-with-component-statemanagement)
 - [Recap](#recap)
@@ -569,9 +569,11 @@ Like the observable itself.
 
 **Declarative Interaction Service**
 ```typescript
+const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]: number } => ({...acc, [key]: value});
+
 export class StateService implements OnDestroy {
     private stateSubscription = new Subscription();
-
+    private stateAccumulator = stateAccumulator;
     private stateSubject = new Subject<Observable<{ [key: string]: number }>>();
     state$ = this.stateSubject
         .pipe(
@@ -579,7 +581,7 @@ export class StateService implements OnDestroy {
             mergeAll(),
             // process single state change
             map(obj => Object.entries(obj).pop()),
-            scan((state, [slice, value]: [string, number]): { [key: string]: number } => ({...state, [slice]: value}), {}),
+            scan(this.stateAccumulator, {}),
             publishReplay(1)
         ) as ConnectableObservable<any>;
 
@@ -692,8 +694,11 @@ Let's see how the solutions look like when we put them into i.e. a service.
 
 **LOW Level Component State Service**
 ```typescript
+const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]: number } => ({...acc, [key]: value});
+
 export class LowLevelStateService implements OnDestroy {
     private subscription = new Subscription();
+    private stateAccumulator = stateAccumulator;
     private effectSubject = new Subject<Observable<{ [key: string]: any }>>();
     private stateSubject = new Subject<Observable<{ [key: string]: any }>>();
     
@@ -701,7 +706,7 @@ export class LowLevelStateService implements OnDestroy {
         .pipe(
             mergeAll(),
             map(obj => Object.entries(obj).pop()),
-            scan((acc, [key, value]: [string, any]): { [key: string]: any } => ({...acc, [key]: value}), {}),
+            scan(this.stateAccumulator, {}),
             publishReplay(1)
         ) as ConnectableObservable<any>;
 
@@ -731,11 +736,6 @@ export class LowLevelStateService implements OnDestroy {
 
 **LOW Level Component State Service**
 ```typescript
-import {Component, Input} from '@angular/core';
-import {interval, Subject} from "rxjs";
-import {map, tap} from "rxjs/operators";
-import {LowLevelStateService} from "./low-level-component-state.service";
-
 @Component({
     selector: 'low-level-state-component',
     template: `
@@ -771,7 +771,6 @@ export class AnyComponent {
 
 }
 ```
-
 
 # Dynamic Component State and Reactive Context
 With a more declarative interaction between component and service we made a big change.
@@ -879,3 +878,14 @@ The solution for dynamic Observables from the view belongs not to this document.
 
 ## Overriding State Changes and Effects
 
+As we are noe able to provide observables that contain our state changes a new question needs to get asked.
+
+What happens if we provide provide multiple observables for the same state slice?
+
+Two possible things can happen:
+- Both observable get merged and all emissions change the same state slice concurrent
+- The new observable for a same state slice overrides the changes from the previous observable for this state slice
+
+Let's discuss scenarios for both.
+
+**Concurrent State Changes**

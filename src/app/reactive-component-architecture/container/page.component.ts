@@ -12,7 +12,7 @@ import {map} from 'rxjs/operators';
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComponentStatePageComponent {
+export class PageComponent {
     num$ = timer(0, 10000)
         .pipe(map(_ => Math.random() < 0.5 ? 10000 : 5000));
 }

@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Store} from '@ngrx/store';
-import {ComponentStateService} from './component-state.service';
+import {ComponentStateService} from '../component-state/component-state.service';
 import {combineLatest, Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
-import {loadList} from './global-state/actions';
-import {selectGitHubList} from './global-state/selectors';
-import {Item} from "./global-state/item.interface";
+import {loadList} from '../global-state/actions';
+import {selectGitHubList} from '../global-state/selectors';
+import {Item} from "../global-state/item.interface";
 
 export interface ComponentState {
     selectedItemIds?: string[];

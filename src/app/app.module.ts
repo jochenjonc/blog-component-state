@@ -10,8 +10,8 @@ import {AppComponent} from './app.component';
 import {ColdCompositionModule} from "./cold-composition/cold-composition.module";
 import {LateSubscriberModule} from "./late-subscriber/late-subscriber.module";
 import {SubscriptionHandlingModule} from "./subscription-handling/subscription-handling.module";
-import {listReducer} from "./component-state/global-state/reducer";
-import {GlobalEffects} from "./component-state/global-state/effects";
+import {listReducer} from "./reactive-component-architecture/global-state/reducer";
+import {GlobalEffects} from "./reactive-component-architecture/global-state/effects";
 import {ROUTES} from "./app.routes";
 import {TimingModule} from "./timing/timing.module";
 import {DeclarativeInteractionModule} from "./declarative-interaction/declarative-interaction.module";
@@ -26,14 +26,6 @@ import {StateInitAndCleanupModule} from "./state-init-and-cleanup/state-init-and
                 (state: any | undefined, action: any) => listReducer(state, action)
         }),
         EffectsModule.forRoot([GlobalEffects]),
-
-        TimingModule,
-        ColdCompositionModule,
-        LateSubscriberModule,
-        SubscriptionHandlingModule,
-        DeclarativeInteractionModule,
-        LowLevelComponentStateModule,
-        StateInitAndCleanupModule,
 
         RouterModule.forRoot(ROUTES)
     ],

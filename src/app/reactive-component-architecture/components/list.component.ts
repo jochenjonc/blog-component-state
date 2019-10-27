@@ -2,8 +2,8 @@ import {ChangeDetectionStrategy, Component, Input, Output} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms'
 import {Subject} from 'rxjs';
 import {map, shareReplay, startWith, switchMap} from 'rxjs/operators';
-import {isArray} from './utils';
-import {Item} from "./global-state/item.interface";
+import {isArray} from '../component-state/utils';
+import {Item} from "../global-state/item.interface";
 
 export interface ListConfig {
     list: Item[],
@@ -31,7 +31,7 @@ export interface ListConfig {
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComponentStateListComponent {
+export class ListComponent {
 
     config$ = new Subject<ListConfig>();
     form$ = this.config$
