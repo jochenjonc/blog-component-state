@@ -21,17 +21,12 @@ export class ProcessOverrideSliceComponent {
     process2Ms$$ = new Subject<number>();
 
     constructor(private pH: ProcessHandlerService) {
-        console.log('Container Constructor');
-        this.pH.stateObservables$$
-            .next({
-                prc1: this.process1Ms$$
-                    .pipe(switchMap(ms => timer(0, ms)))
-            });
-        this.pH.stateObservables$$
-            .next({
-                prc2: this.process2Ms$$
-                    .pipe(switchMap(ms => timer(0, ms).pipe(map(v => v*10))))
-            });
+        this.pH.connectSlice(this.process1Ms$$
+                .pipe(switchMap(ms => timer(0, ms)))
+        );
+        this.pH.connectSlice(this.process2Ms$$
+            .pipe(switchMap(ms => timer(0, ms).pipe(map(v => v*10))))
+        );
     }
 
 }

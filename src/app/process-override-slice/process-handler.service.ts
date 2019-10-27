@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {Observable, of, Subject} from 'rxjs';
+import {ConnectableObservable, Observable, of, Subject, Subscription} from 'rxjs';
 import {groupBy, map, mergeAll, scan, switchMap} from 'rxjs/operators';
 
 @Injectable({
@@ -7,9 +7,9 @@ import {groupBy, map, mergeAll, scan, switchMap} from 'rxjs/operators';
 })
 export class ProcessHandlerService implements OnDestroy {
 
-    onDestroy$ = new Subject();
+    subscription = new Subscription();
 
-    stateObservables$$ = new Subject<{ [key: string]: Observable<number> }>();
+    private stateObservables$$ = new Subject<{ [key: string]: Observable<number> }>();
     state$ = this.stateObservables$$
         .pipe(
             // {sliceName: observable} => sliceName
@@ -29,10 +29,18 @@ export class ProcessHandlerService implements OnDestroy {
             ),
             mergeAll(),
             scan((acc, [key, value]: [string, number]): { [key: string]: number } => ({...acc, [key]: value}), {})
-        );
+        ) as ConnectableObservable<{ [key: string]: number }>;
+
+    constructor() {
+        this.subscription = this.state$.connect();
+    }
+
+    connectSlice(o) {
+        this.stateObservables$$.next(o);
+    }
 
     ngOnDestroy(): void {
-        this.onDestroy$.next(true);
+        this.subscription.unsubscribe();
     }
 
 }

@@ -34,6 +34,9 @@ import {Component} from '@angular/core';
             <li>
                 <a [routerLink]="['low-level-component-state']">Low Level Component State</a>
             </li>
+            <li>
+                <a [routerLink]="['state-init-cleanup']">State Init and Cleanup</a>
+            </li>
         </ul>
         <router-outlet></router-outlet>
     `

@@ -5,7 +5,7 @@ import {map, scan, takeUntil, tap} from 'rxjs/operators';
 @Injectable({
     providedIn: 'root'
 })
-export class ProcessHandlerBadService implements OnDestroy {
+export class ComponentStateBadService implements OnDestroy {
 
     onDestroy$ = new Subject();
 

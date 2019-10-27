@@ -204,9 +204,9 @@ And that's not what we want.
 Another downside is the bundle size of ShareReplay. 
 But it will be used anyway somewhere in our architecture, so it's a general downside.
 
-# Sharing references (SHOULD NOT BE SOLVE BY COMPONENT STATE) 
+# Sharing references (will not be solved by component-state) 
 
-Let me front off explain that this section is here specifically to explain
+Let me front off explain that this section is specifically here to explain
 why this problem **should not be part of the components state-management**.
 
 To start this section let's discuss the components implementation details first.
@@ -421,7 +421,7 @@ export class ColdCompositionBadComponent implements OnDestroy {
 }
 ```
 
-If we run the code we would start out rendering with {sum: 1}.
+If we run the code we would start rendering with {sum: 1}.
 
 The service is the first thing that gets initialised.
 The initial commands are fired, but the initial values are fired before the component gets instantiated
@@ -774,6 +774,108 @@ export class AnyComponent {
 
 
 # Dynamic Component State and Reactive Context
+With a more declarative interaction between component and service we made a big change.
+We are now aware of the whole observable context. 
+
+The `next`, `error` and `compolete` notifications.
+
+This can help us to rethink a lot of problems that did not occur with global state management.
+
 ## Initialisation and Cleanup
+
+Initializing the state worked well in global state management by providing a default value in the reducer function. 
+With a highly dynamic state like we have with the components state we also have to think about cleanup.
+
+With the declarative approach we have now the ability to react on the completion of an observable.
+
+The current accumulation function for the components state looks like this:
+
+```typescript
+const stateAccumulator = (state, [key, value]: [string, number]): { [key: string]: number } => ({...state, [key]: value});
+```
+
+Let's add minimal logic to our state accumulation part and discuss it.
+
+```typescript
+const stateAccumulator = (state, [keyToDelete, value]: [string, number]): { [key: string]: number } => { 
+    const isKeyToDeletePresent = keyToDelete in state;
+    // The key you want to delete is not stored :)
+    if (!isKeyToDeletePresent && value === undefined) {
+        return state;
+    }
+    // Delete slice
+    if (value === undefined) {
+        const {[keyToDelete]: v, ...newS} = state as any;
+        return newS;
+    }
+    // update state
+    return ({...state, [keyToDelete]:value});
+};
+```
+
+Now lets thing about the following example:
+
+```typescript
+@Component({
+    selector: 'state-init-and-cleanup-bad',
+    template: `
+    <button (click)="addDynamicState()">Add dynamic state</button>
+    <p><b>state$:</b></p>
+    <pre>{{state$ | async | json}}</pre>
+  `,
+    providers: [ComponentStateService]
+})
+export class StateInitAndCleanupComponent {
+    state$ = this.componentState.state$;
+
+    constructor(private componentState: ComponentStateService) {
+    }
+
+    addDynamicState() {
+        this.componentState.connectSlice(this.getDynamicStateSlice())
+    }
+
+    getDynamicStateSlice(): Observable<{ [key: string]: number | undefined }> {
+        const rnd = (p = 1): number => ~~(Math.random() * (10 ** p));
+        const takeCount = rnd(1);
+        const intervalDuration = rnd(3);
+        const id = `rnd ${rnd(2)}-${intervalDuration}-${takeCount}`;
+        const interval$ = interval(intervalDuration).pipe(map(_ => ({[id]: rnd()})), take(takeCount));
+
+        return interval$;
+    }
+
+}
+```
+
+Whenever we click the button we add a state slice from an observable. The observable has a random number of emissions in a random interval.
+If the interval ends the key still stuck's in the state object.
+
+As the keys where dynamic there is not really a good way of detection which key is not changing anymore and can be removed.
+
+Let's see what we can do with the above example.
+As we know we adopted the accumulation function to remove keys with undefined from the state object.
+
+By emitting `undefined` after emission of the last value we can cleanup this state.
+We can also initialize it with zero even if the first value is sent later in time.
+
+Lets add one line to our state slice observable:
+
+```typescript
+getDynamicStateSlice(): Observable<{ [key: string]: number | undefined }> {
+        ... 
+        const interval$ = interval(intervalDuration).pipe(map(_ => ({[id]: rnd()})), take(takeCount));
+        const observables = [of({[id]: 0}), interval$, of({[id]: undefined})];
+        return concat(...observables);
+    }
+```
+
+Now we have an immediate initial value if the state changes are started and cleanup-logic if the state observable is no longer needed.
+
+Thinks about many dynamic parts of your view that you display and hide or some that you rarely show in the UI.
+All those dynamism is automatically solved if the source stream completes.
+
+The solution for dynamic Observables from the view belongs not to this document.
+
 ## Overriding State Changes and Effects
 

@@ -7,6 +7,7 @@ import {ROUTES as PROCESS_OVERRIDE_SLICE_ROUTES} from "./process-override-slice/
 import {ROUTES as SHARING_A_REFERENCE_ROUTES} from "./sharing-a-reference/sharing-a-reference.module";
 import {ROUTES as DECLARATIVE_INTERACTION_ROUTES} from "./declarative-interaction/declarative-interaction.module";
 import {ROUTES as LOW_LEVEL_STATE_ROUTES} from "./low-level-component-state/low-level-component-state.module";
+import {ROUTES as STATE_INIT_CLEANUP_ROUTES} from "./state-init-and-cleanup/state-init-and-cleanup.module";
 
 export const ROUTES = [
     {
@@ -23,5 +24,6 @@ export const ROUTES = [
     {path: 'sharing-a-reference', children: SHARING_A_REFERENCE_ROUTES},
     {path: 'declarative-interaction', children: DECLARATIVE_INTERACTION_ROUTES},
     {path: 'low-level-component-state', children: LOW_LEVEL_STATE_ROUTES},
+    {path: 'state-init-cleanup', children: STATE_INIT_CLEANUP_ROUTES},
 
 ];

@@ -14,18 +14,19 @@ export interface SliceConfig {
     endWith?: any,
 }
 
-const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]: number } => ({...acc, [key]: value});
+const defaultStateAccumulator = (state, [key, value]: [string, number]): { [key: string]: number } => ({...state, [key]: value})
 
-export class LowLevelStateService implements OnDestroy {
+export class ComponentStateService implements OnDestroy {
     private subscription = new Subscription();
     private effectSubject = new Subject<Observable<{ [key: string]: number }>>();
     private stateSubject = new Subject<Observable<{ [key: string]: number }>>();
 
+    public stateAccumulator = defaultStateAccumulator;
     state$ = this.stateSubject
         .pipe(
             mergeAll(),
             map(obj => Object.entries(obj).pop()),
-            scan(stateAccumulator, {}),
+            scan(this.stateAccumulator, {}),
             publishReplay(1)
         ) as ConnectableObservable<any>;
 

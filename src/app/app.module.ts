@@ -16,6 +16,7 @@ import {ROUTES} from "./app.routes";
 import {TimingModule} from "./timing/timing.module";
 import {DeclarativeInteractionModule} from "./declarative-interaction/declarative-interaction.module";
 import {LowLevelComponentStateModule} from "./low-level-component-state/low-level-component-state.module";
+import {StateInitAndCleanupModule} from "./state-init-and-cleanup/state-init-and-cleanup.module";
 
 @NgModule({
     imports: [
@@ -32,6 +33,7 @@ import {LowLevelComponentStateModule} from "./low-level-component-state/low-leve
         SubscriptionHandlingModule,
         DeclarativeInteractionModule,
         LowLevelComponentStateModule,
+        StateInitAndCleanupModule,
 
         RouterModule.forRoot(ROUTES)
     ],

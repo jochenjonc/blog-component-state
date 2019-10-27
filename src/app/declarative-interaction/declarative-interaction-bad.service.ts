@@ -2,6 +2,7 @@ import {OnDestroy} from '@angular/core';
 import {ConnectableObservable, Subject, Subscription} from 'rxjs';
 import {map, publishReplay, scan} from 'rxjs/operators';
 
+const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]: number } => ({...acc, [key]: value});
 
 export class DeclarativeInteractionBadService implements OnDestroy {
     private stateSubscription = new Subscription();
@@ -11,7 +12,7 @@ export class DeclarativeInteractionBadService implements OnDestroy {
         .pipe(
             // process single state change
             map(obj => Object.entries(obj).pop()),
-            scan((state, [slice, value]: [string, number]): { [key: string]: number } => ({...state, [slice]: value}), {}),
+            scan(stateAccumulator, {}),
             publishReplay(1)
         ) as ConnectableObservable<any>;
 

@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {Subject, timer} from "rxjs";
 import {map, switchMap} from "rxjs/operators";
-import {ProcessHandlerBadService} from "./process-handler-bad.service";
+import {ComponentStateBadService} from "./process-handler-bad.service";
 
 @Component({
     selector: 'process-override-slice-bad',
@@ -15,7 +15,7 @@ import {ProcessHandlerBadService} from "./process-handler-bad.service";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProcessOverrideSliceBadComponent {
-    state$ = this.pH.state$;
+    state$ = this.componentState.state$;
 
     process1Ms$$ = new Subject<number>();
     process2Ms$$ = new Subject<number>();
@@ -25,16 +25,16 @@ export class ProcessOverrideSliceBadComponent {
             switchMap(ms => timer(0, ms)),
             map(n => ({prc1: n})),
         )
-        .subscribe({next: c => this.pH.state$$.next(c)});
+        .subscribe({next: c => this.componentState.state$$.next(c)});
 
     process2$ = this.process2Ms$$
         .pipe(
             switchMap(ms => timer(0, ms)),
             map(n => ({prc2: n})),
         )
-        .subscribe({next: c => this.pH.state$$.next(c)});
+        .subscribe({next: c => this.componentState.state$$.next(c)});
 
-    constructor(private pH: ProcessHandlerBadService) {
+    constructor(private componentState: ComponentStateBadService) {
         console.log('Container Constructor');
     }
 
