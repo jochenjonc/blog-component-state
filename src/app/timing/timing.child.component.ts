@@ -17,15 +17,16 @@ import {tap} from 'rxjs/operators';
 @Component({
     selector: 'timing-child',
     template: `
-  <p>Child Template Expression: {{templateExpression$ | async | childPipe}}</p>
+    <p>Child Template Expression: {{templateExpression$ | async | childPipe}}</p>
+        <input [value]="'templateBinding' | childPipe">
   `,
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [TimingLocalService]
 })
 export class TimingChildComponent implements OnChanges, OnInit, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy {
 
-    templateExpression$ = of(null)
-        .pipe(tap(_ => console.log('ChildComponent template expression')));
+    templateExpression$ = of('templateExpression')
+        .pipe(tap(_ => console.log('ChildComponent templateExpression')));
 
     constructor(private localService: TimingLocalService) {
         console.log('ChildComponent Constructor');

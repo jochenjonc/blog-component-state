@@ -5,7 +5,7 @@ import {Component} from '@angular/core';
     template: `
         <ul>
             <li>
-                <a [routerLink]="['timing']">timing</a>
+                <a [routerLink]="['timing']">Timing</a>
             </li>
             <li>
                 <a [routerLink]="['subscription-handling']">Subscription Handling</a>

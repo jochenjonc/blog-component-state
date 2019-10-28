@@ -349,15 +349,70 @@ And if we unsubscribe we remove only this function, and not the others.
 Means there is one producer instance fol all subscription.
 i.e. A subject that emits the values from a single producer to all subscriber.
 
-With this in mind we can discuss the problem of cold composition.
+With this in mind we can discuss the problem of cold composition in case of our component state.
+
+--- 
+
+As we will have to deal with:
+- View Interaction ( button click )
+- Global State Changes ( http update )
+- Component State Changes ( triggered by button or interval )
+
+Putting all this logic in the component class is a bit messy. 
+We need to provide a **minimal layer of abstraction** that handles composition of all the different sources!
+
+So far our sources got subscribed to when the view was ready and we rendered the state.
+As the view represents a hot producer of values and injected services too we have to decouple the service that handles component state from other sources.
+
+So what is the problem?
+
+We have hot sources and we have to compose them.
+As a minimal requirement to create state we should have at least the last emission of each source to compute a state.
 
 If we compose state we have to consider that every operator returns cold observables.
 (Multi-casting operators are not really operators as they are not compos-able)
 
-So no matter what we do before, after an operation we get a cold observable.
+So no matter what we do before, after an operation we get a cold observable, and we have to subscribe to it to trigger the composition.
 I call this situation cold composition, as with selector functions in i.e. publish we are also able to create hot compositions.
 
-Let's see an simple example where we compose different sources in a service:
+Some of our sources are This can be solved by tow ways: 
+- a) Make all sources replay at least their last value (push workload to all relevant sources)
+- b) Make the composition hot as early as possible (push workload to the component related part)
+
+Let's discuss a) first.
+
+If we would make every source replay at least the last value we would have to implement this logic in following places:
+- View Input bindings (multiple times)
+- View events (multiple times)
+- Other Service Changes (multiple times)
+- Component Internal interval (multiple times)
+
+It would also force the parts to cache values and increase memory.
+Furthermore it would force third party to implement tis too. 
+
+IMHO not really scalable.
+
+What would be the scenario with b)?
+
+We could think of the earliest possible moment to make the composition hot. 
+From the diagram above we know that a service, even if locally provided, 
+is instantiated first, before the component.
+
+If we would put it there we could take over the workload from:
+- View Input bindings (multiple times)
+- View events (multiple times)
+- Component Internal interval (multiple times)
+
+All involved services can not be covered. 
+
+But what services are we interested in?
+
+Stateful services, and stateful services will, by definition, always provide there last emitted state.
+So if we compose other sources form services like `@ngRx/store` etc. we can assume they replay their last emitted state and we can run the composition.
+
+In worse case we could fix it by concating with an initial value. 
+
+Let's see an simple example where we compose different sources in a service and and one of our sources is not replaying the last value:
 
 **Service:**
 ```typescript
@@ -431,18 +486,7 @@ Even if the source is hot (the subject in the service is defined on instantiatio
 Which means the composed values can be received only if there is at least 1 subscriber. 
 In our case the subscriber was the component constructor. 
 
-Let's specify the problem first: 
-Services are the things in Angular that are instantiated first.  
-This means the component it self, independent from all lifecycle hooks is a late subscriber.  
-This means if any composition is done in the service no matter if the sources are hot or cold, it can oly happen when the component subscribes.  
-
-We can solve this problem in two ways: 
-a) make all involved hot sources replay the [n] values (i.e. @Input with RelpaySubject)
-b) make the composition hot in the service
-
-As a) is not applicable at all and b) is more efficient we go with b)  
-
-Let's see how we can implement this:
+Let's see how we can implement the above discussed solution with hot composition:
 
 **Hot Composition Service:**
 ```typescript
@@ -783,7 +827,8 @@ This can help us to rethink a lot of problems that did not occur with global sta
 ## Initialisation and Cleanup
 
 Initializing the state worked well in global state management by providing a default value in the reducer function. 
-With a highly dynamic state like we have with the components state we also have to think about cleanup.
+Also with input bindings we could set a default value. But there are situations where we need to initialize a not yet emitted state.
+In addition to that with a highly dynamic state like we have with the components state we also have to think about cleanup unused state.
 
 With the declarative approach we have now the ability to react on the completion of an observable.
 
