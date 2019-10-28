@@ -1,4 +1,4 @@
-# Problems in when managing component state with Angular
+# Reactive Component State
 
 <!-- toc -->
 
@@ -934,3 +934,6 @@ Two possible things can happen:
 Let's discuss scenarios for both.
 
 **Concurrent State Changes**
+
+
+**Override State Changes**
