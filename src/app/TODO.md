@@ -32,7 +32,7 @@ interface DenormalizedTodoListEntity {
 2. As long as the component lives we **automatically refresh** every [n] seconds the list of todo lists as well as todo items. 
 [n] is retrieved from the parent component over an **input binding**.
 3. The presented table should provide a checkbox for every item that marks it for deletion. The interesting thing here, this **state exists only locally** in the component.
-**Only if the user does another interaction** (button click in step 4) we persist the new state of the items.
+**Only if the user does another interaction** (button click in step 4) we persist the new state of the todo list.
 4. If **at least one checkbox is clicked, the user can click** the delete button.
  If the button is clicked we need to **persist those changes to the server**.
 5. There are random situations where the **server** does not process the deletion of items and **responds with an error**.
