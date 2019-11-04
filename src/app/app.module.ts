@@ -6,32 +6,47 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {StoreModule} from '@ngrx/store';
 import {EffectsModule} from '@ngrx/effects';
 
-import {AppComponent} from './app.component';
-import {ColdCompositionModule} from "./cold-composition/cold-composition.module";
-import {LateSubscriberModule} from "./late-subscriber/late-subscriber.module";
-import {SubscriptionHandlingModule} from "./subscription-handling/subscription-handling.module";
-import {listReducer} from "./reactive-component-architecture/global-state/reducer";
-import {GlobalEffects} from "./reactive-component-architecture/global-state/effects";
+import {listReducer} from "./examples/reactive-component-architecture/global-state/reducer";
+import {GlobalEffects} from "./examples/reactive-component-architecture/global-state/effects";
 import {ROUTES} from "./app.routes";
-import {TimingModule} from "./timing/timing.module";
-import {DeclarativeInteractionModule} from "./declarative-interaction/declarative-interaction.module";
-import {LowLevelComponentStateModule} from "./low-level-component-state/low-level-component-state.module";
-import {StateInitAndCleanupModule} from "./state-init-and-cleanup/state-init-and-cleanup.module";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { LayoutModule } from '@angular/cdk/layout';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import {AppComponent} from "./app-component/app.component";
+import {MatCardModule} from "@angular/material";
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
+import {GithubModule} from "@data-access/github";
+import {ArchitectureModule} from "./examples/architecture/architecture.module";
 
+export const materialModules = [
+    BrowserAnimationsModule,
+    LayoutModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatCardModule
+];
 @NgModule({
     imports: [
         BrowserModule, HttpClientModule, ReactiveFormsModule,
-        StoreModule.forRoot({
-            github:
-                (state: any | undefined, action: any) => listReducer(state, action)
-        }),
+        StoreModule.forRoot({}),
         EffectsModule.forRoot([GlobalEffects]),
+        StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
 
-        RouterModule.forRoot(ROUTES)
+        RouterModule.forRoot(ROUTES),
+        materialModules,
+        GithubModule,
+        // ArchitectureModule
+
     ],
-    declarations: [
-        AppComponent
-    ],
+    declarations: [AppComponent],
     bootstrap: [AppComponent]
 })
 export class AppModule {

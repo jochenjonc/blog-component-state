@@ -1,0 +1,30 @@
+<!-- NOTE: in the view the only variable we want to touch is `vm`-->
+<h3>List Component</h3>
+<button mat-raised-button color="primary"
+        (click)="m.refreshClicks.next($event)">
+    Refresh List
+</button>
+gitHubList: {{gitHubList | async | json}}
+<ng-container *ngIf="m.configChanges | async as config">
+
+    <div *ngIf="config.list.length; else noList">
+        <mat-selection-list
+                (selectionChange)="m.selectionChangeObserver.next($event)">
+            <ng-container>
+                <mat-list-option *ngFor="let item of config.list"
+                                 [value]="item"
+                                 [selected]="(m.selectedOptionsChanges | async)[item.id] === true">
+                    {{item | json}}
+                </mat-list-option>
+            </ng-container>
+        </mat-selection-list>
+        <p>
+            Options selected: {{config.selectedItemIds.length}}
+        </p>
+    </div>
+
+    <ng-template #noList>
+        <mat-card>No list given!</mat-card>
+    </ng-template>
+
+</ng-container>

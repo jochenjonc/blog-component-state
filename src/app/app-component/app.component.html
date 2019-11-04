@@ -1,0 +1,38 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #drawer class="sidenav" fixedInViewport
+                 [attr.role]="(vm.isHandset$ | async) ? 'dialog' : 'navigation'"
+                 [mode]="(vm.isHandset$ | async) ? 'over' : 'side'"
+                 [opened]="(vm.isHandset$ | async) === false">
+        <mat-toolbar>Menu</mat-toolbar>
+        <mat-nav-list>
+            <a mat-list-item [routerLink]="['timing']">Timing</a>
+            <a mat-list-item [routerLink]="['subscription-handling']">Subscription Handling</a>
+            <a mat-list-item [routerLink]="['late-subscriber']">Late Subscriber</a>
+            <a mat-list-item [routerLink]="['sharing-a-reference']">Sharing A Reference</a>
+            <a mat-list-item [routerLink]="['cold-composition']">Cold Composition</a>
+            <a mat-list-item [routerLink]="['declarative-interaction']">Declarative Interaction</a>
+            <a mat-list-item [routerLink]="['low-level-component-state']">Low Level Component State</a>
+            <a mat-list-item [routerLink]="['state-init-cleanup']">State Init and Cleanup</a>
+            <a mat-list-item [routerLink]="['process-override-slice']">Process Override Slice</a>
+            <h3 matSubheader>Architecture</h3>
+            <a mat-list-item [routerLink]="['architecture/mvvm']">MVVM</a>
+            <a mat-list-item [routerLink]="['architecture/mvc']">MVC</a>
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <mat-toolbar color="primary">
+            <button
+                    type="button"
+                    aria-label="Toggle sidenav"
+                    mat-icon-button
+                    (click)="drawer.toggle()"
+                    *ngIf="vm.isHandset$ | async">
+                <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+            </button>
+            <span>Tackle Ephemeral-State Reactive</span>
+        </mat-toolbar>
+        <div class="container">
+            <router-outlet></router-outlet>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>
