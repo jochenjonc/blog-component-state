@@ -1,45 +1,28 @@
-import {Observable, Subject} from "rxjs";
-import {filter, startWith, tap} from "rxjs/operators";
+import {Subject} from "rxjs";
+import {map} from "rxjs/operators";
 import {Injectable} from "@angular/core";
 import {ISimpleListView} from "./simple-list.view.interface";
-import {SimpleListModel} from "./simple-list.component.interface";
-import {ISimpleListViewModel} from "./simple-list.view-model.interface";
+import {ISimpleListVMState} from "./simple-list.view-model.interface";
+import {LowLevelStateService} from "../../state.service";
 
 @Injectable()
-export class SimpleListViewModel implements ISimpleListView {
-    // Data from Model (CONTRACT?)
-    viewModelSubject: Subject<ISimpleListViewModel> = new Subject();
-
-    // ISimpleListViewModel ============================================
+export class SimpleListViewModel extends LowLevelStateService<ISimpleListVMState> implements ISimpleListView {
     // Initial view config
-    initModel: ISimpleListViewModel = {
-        listClosed: false,
+    initState: ISimpleListVMState = {
+        listExpanded: false,
         list: []
     };
 
-    // Derive ViewModel from Model
-    // Optional: Provide initial data to render in the view
-    viewModelChanges: Observable<ISimpleListViewModel> = this.viewModelSubject
-        .pipe(
-            filter<ISimpleListViewModel>(this.isViewModel),
-            startWith(this.initModel),
-        );
-
     // IListView =================================================
-
-    // Listener for button click events
     refreshClicks  = new Subject<Event>();
+    listExpandedChanges  = new Subject<boolean>();
 
     constructor() {
-
-    }
-    //  Formatting (model to other shape) =========================================
-    // Parsing (other shape to model shape)========================================
-    // Filter =====================================================================
-    isViewModel(cfg: ISimpleListViewModel | any): boolean {
-        const isArray = (obj) => (Object.prototype.toString.call(obj) === "[object Array]");
-        return (cfg &&
-            'list' in cfg && isArray(cfg.list));
+        super();
+        this.connectSlice(this.listExpandedChanges
+            .pipe(map(b => ({listExpanded: b})))
+        );
+        this.setSlice(this.initState);
     }
 
 }

@@ -1,6 +1,7 @@
-import {Observer} from "rxjs";
+import {Subject} from "rxjs";
 
 export interface ISimpleListView {
-    // Needed to detect button clicks
-    refreshClicks: Observer<Event>;
+    // All UI-Events or component EventBindings
+    refreshClicks: Subject<Event>;
+    listExpandedChanges: Subject<boolean>
 }

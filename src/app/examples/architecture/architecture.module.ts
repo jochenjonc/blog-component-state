@@ -3,9 +3,14 @@ import {CommonModule} from '@angular/common';
 import {ArchitectureOverviewComponent} from "./architecture-overview.component";
 import {ArchitectMVVMContainerComponent} from "./mvvm/mvvm-container.component";
 import {ListMVVMComponent} from "./mvvm/list/list.component";
-import {ListMVCComponent} from "./mcv/list-view/list.component";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatButtonModule, MatCardModule, MatExpansionModule, MatIconModule, MatListModule} from "@angular/material";
+import {
+    MatBadgeModule,
+    MatButtonModule,
+    MatCardModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatListModule
+} from "@angular/material";
 import {ArchitectMVCContainerComponent} from "./mcv/mvc-container.component";
 import {SimpleListMVVMComponent} from "./mvvm/simple-list/simple-list.component";
 
@@ -23,7 +28,6 @@ export const ROUTES = [
 const DECLARATIONS = [
     SimpleListMVVMComponent, ListMVVMComponent,
     ArchitectMVVMContainerComponent,
-     ListMVCComponent,
      ArchitectMVCContainerComponent
 ];
 export const materialModules = [
@@ -31,7 +35,8 @@ export const materialModules = [
     MatListModule,
     MatCardModule,
     MatButtonModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatBadgeModule
 ];
 
 @NgModule({

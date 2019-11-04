@@ -1,6 +1,7 @@
 import {SimpleListItem} from "../../interfaces";
 
-export interface ISimpleListVMState {
+export interface IListViewState {
     list?: SimpleListItem[],
+    selectedItems?: SimpleListItem[],
     listExpanded?: boolean
 }

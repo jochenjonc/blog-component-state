@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, Component, Input, OnDestroy, Output} from '@angular/core';
-import {merge, Subject, Subscription} from 'rxjs';
+import {ChangeDetectionStrategy, Component, Output} from '@angular/core';
 import {ListViewModel} from './list.view-model';
-import {IListComponent, ListConfig, ListItem} from "./list.component.interface";
 import {Store} from "@ngrx/store";
-import {map, scan, tap} from "rxjs/operators";
+import {map, tap} from "rxjs/operators";
 import {fetchRepositoryList, RepositoryListItem, selectGitHubList} from "@data-access/github";
+import {SimpleListItem} from "../../interfaces";
+import {Observable} from "rxjs";
 
 @Component({
     selector: 'arc-mvvm-list-view',
@@ -12,37 +12,15 @@ import {fetchRepositoryList, RepositoryListItem, selectGitHubList} from "@data-a
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ListViewModel]
 })
-export class ListMVVMComponent implements IListComponent, OnDestroy {
-    subscription = new Subscription();
+export class ListMVVMComponent {
 
-    configInputObserver = new Subject<ListConfig>();
-    @Input()
-    set config(c: ListConfig) {
-        this.configInputObserver.next(c);
-    };
     @Output()
-    readonly selectedItemIdsChanges = this.vm.selectedItemIdsChanges;
+    selectionChanges: Observable<string[]> = this.vm.state$
+        .pipe(map(s => s.selectedItems.map(i => i.id)));
 
     // State from outer sources
-    globalList = this.store;
-        // .select(selectGitHubList).pipe(map(this.parseListItems), tap(l =>  console.log('list global', l)));
-
-    // ViewModelInputs
-    configChanges = merge(
-        // Shape: {list: []}
-        this.globalList
-            .pipe(map(list => ({list}))),
-        // Shape: {list: [], selectedItemIds: []}
-        this.configInputObserver,
-        // Shape: {selectedItemIds: []}
-        this.vm.selectedItemIdsChanges
-            .pipe(map(selectedItemIds => ({selectedItemIds})))
-    )
-        .pipe(
-            tap(console.log),
-            scan((s, c) => ({...s, ...c }),
-                {list: [], selectedItemIds: []})
-        );
+    globalList = this.store
+         .select(selectGitHubList).pipe(map(this.parseSimpleListItems), tap(l =>  console.log('list global', l)));
 
     // Component-Level Side-Effects
     refreshClickEffect = this.vm.refreshClicks
@@ -50,21 +28,14 @@ export class ListMVVMComponent implements IListComponent, OnDestroy {
     );
 
     constructor(public vm: ListViewModel, private store: Store<any>) {
-        this.globalList
-            .pipe(map(list => ({list}))).subscribe(console.log)
         // connect ViewModel
-        this.vm.configObserver = this.configChanges;
+        this.vm.connectSlice(this.globalList.pipe(map(list => ({list}))));
         // register side-effects
-        this.subscription.add(this.refreshClickEffect.subscribe());
+        this.vm.connectEffect(this.refreshClickEffect);
     }
-
-    ngOnDestroy(): void {
-        this.subscription.unsubscribe();
-    }
-
 
     // map RepositoryListItem to ListItem
-    parseListItems(l: RepositoryListItem[]): ListItem[] {
+    parseSimpleListItems(l: RepositoryListItem[]): SimpleListItem[] {
         return l.map(({id, name}) => ({id, name}))
     }
 

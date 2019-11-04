@@ -1,65 +1,48 @@
-import {defer, Observable, Subject} from "rxjs";
-import {filter, map, startWith} from "rxjs/operators";
+import {Subject} from "rxjs";
+import {map, tap} from "rxjs/operators";
 import {Injectable} from "@angular/core";
-import {MatSelectionListChange} from "@angular/material";
+import {LowLevelStateService} from "../../state.service";
+import {IListViewState} from "./list.view-state.interface";
 import {IListView} from "./list.view.interface";
-import {IListModel} from "./list.model.interface";
-import {ListConfig, selectedIds} from "./list.component.interface";
+import {MatSelectionListChange} from "@angular/material";
 
 @Injectable()
-export class ListViewModel implements IListModel, IListView {
-    // IListViewModel ============================================
-
+export class ListViewModel extends LowLevelStateService<IListViewState> implements IListView {
     // Initial view config
-    initialListConfig = {list: [], selectedItemIds: []};
-    // Data from component class
-    configObserver: Observable<ListConfig>;
-    // Sending first value and filtering out bad values
-    configChanges = defer(() => this.configObserver
-        .pipe(
-            filter<ListConfig>(this.isListConfig)
-        )
-    );
+    private initState: IListViewState = {
+        listExpanded: true,
+        list: [],
+        selectedItems: []
+    };
 
     // IListView =================================================
-
-    // Listener for button click events
-    refreshClicks  = new Subject<Event>();
-
-    // Listener for list selectionChange events
-    selectionChangeObserver = new Subject<MatSelectionListChange>();
-    // Send command to component class
-    selectedItemIdsChanges = this.selectionChangeObserver.pipe(
-        map(this.parseSelectedIds)
-    );
-    // Derive IdMap of selected items to set selection in view (shortcut in the view)
-    selectedOptionsChanges = this.configChanges
+    selectedOptionsChanges = this.state$
         .pipe(
-            map(c => c.selectedItemIds),
-            map(this.parseSelectedOptions)
+            map(s => s.selectedItems
+                .reduce((m, i) => ({...m, [i.id]: true}),
+                    {} as { [key: string]: boolean })
+            )
         );
+    refreshClicks = new Subject<Event>();
+    selectionChanges = new Subject<MatSelectionListChange>();
+    listExpandedChanges = new Subject<boolean>();
 
     constructor() {
+        super();
+        this.setSlice(this.initState);
 
-    }
-    //  Formatting (model to other shape) =========================================
-    // Parsing (other shape to model shape)========================================
-    // Filter =====================================================================
-    parseSelectedIds(change: MatSelectionListChange): selectedIds {
-        return change.source.selectedOptions.selected
-            .map(option => option.value.id);
-    }
 
-    isListConfig(cfg: ListConfig | any): boolean {
-        const isArray = (obj) => (Object.prototype.toString.call(obj) === "[object Array]");
-        return (cfg &&
-            'list' in cfg && isArray(cfg.list) &&
-            'selectedItemIds' in cfg && isArray(cfg.selectedItemIds));
-    }
+        this.connectSlice(this.listExpandedChanges
+            .pipe(tap(console.log), map(b => ({listExpanded: b})))
+        );
 
-    parseSelectedOptions(ids: selectedIds): {[id: string]: boolean} {
-        return ids
-            .reduce((m, i)=> ({...m, [i]: true}), {});
+        this.connectSlice(this.selectionChanges
+            .pipe(
+                map(c => c.source.selectedOptions.selected.map(o => o.value)),
+                map(selectedItems => ({selectedItems}))
+            )
+        );
+
     }
 
 }

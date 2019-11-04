@@ -1,13 +1,15 @@
-import {Observer, Subscribable} from "rxjs";
+import {Observable, Observer, Subject, Subscribable} from "rxjs";
 import {MatSelectionListChange} from "@angular/material";
 
 export interface IListView {
     // Needed to detect button clicks
-    refreshClicks: Observer<Event>;
+    refreshClicks: Subject<Event>;
     // Needed to set selected state
-    selectedOptionsChanges: Subscribable<{[key: string]: boolean}>;
+    listExpandedChanges: Subject<boolean>
     // Observe changes to set selected state
-    selectionChangeObserver: Observer<MatSelectionListChange>;
+    selectionChanges: Observer<MatSelectionListChange>;
+    // VM derivations
+    selectedOptionsChanges: Observable<{[key: string]: boolean}>;
     // Filter / Parse / Format
     parseSelectedOptions?(l: string[]): {[id: string]: boolean}
 }

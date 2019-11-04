@@ -1,44 +1,35 @@
-import {ChangeDetectionStrategy, Component, OnDestroy} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {SimpleListViewModel} from './simple-list.view-model';
-import {SimpleListItem} from "./simple-list.component.interface";
 import {Store} from "@ngrx/store";
 import {map, tap} from "rxjs/operators";
 import {fetchRepositoryList, RepositoryListItem, selectGitHubList} from "@data-access/github";
+import {SimpleListItem} from "../../interfaces";
 
 @Component({
     selector: 'arc-mvvm-simple-list-view',
     templateUrl: './simple-list.view.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [SimpleListViewModel]
 })
-export class SimpleListMVVMComponent implements OnDestroy {
-    subscription = new Subscription();
-    vm = new SimpleListViewModel();
-
+export class SimpleListMVVMComponent {
     // State from other sources
     globalList = this.store.select(selectGitHubList)
         .pipe(map(this.parseListItems));
 
-    // Component Model - composed out of one or multiple sources
     // Component Side-Effects - UI interactions, Background processes
     refreshClickEffect = this.vm.refreshClicks
         .pipe(tap(_ => this.store.dispatch(fetchRepositoryList({})))
-    );
-    updateVMEffect = this.globalList
-        .pipe(
-            map(list => ({list})),
-            tap(vM => this.vm.viewModelSubject.next(vM))
         );
 
-    constructor(private store: Store<any>) {
-        // Connect Model to ViewModel
-        this.subscription.add(this.updateVMEffect.subscribe());
-        // Register Side-Effects
-        this.subscription.add(this.refreshClickEffect.subscribe());
-    }
+    constructor(public vm: SimpleListViewModel,
+                private store: Store<any>) {
+        // Component Model - composed out of one or multiple sources
+        this.vm.connectSlice(this.globalList
+            .pipe(map(list => ({list})))
+        );
 
-    ngOnDestroy(): void {
-        this.subscription.unsubscribe();
+        // Register Side-Effects For lifetime of ViewModel
+        this.vm.connectEffect(this.refreshClickEffect);
     }
 
     // Map RepositoryListItem to ListItem

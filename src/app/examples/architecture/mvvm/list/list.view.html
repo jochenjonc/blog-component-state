@@ -1,32 +1,37 @@
 <!-- NOTE: in the view the only variable we want to touch is `vm`-->
 <h3>List Component</h3>
-<button mat-raised-button color="primary"
-        (click)="vm.refreshClicks.next($event)">
-    Refresh List
-</button>
+{{(vm.state$ | async) | json}}
+<mat-expansion-panel
+        *ngIf="vm.state$ | async as state"
+        (expandedChange)="vm.listExpandedChanges.next($event)"
+        [expanded]="state.listExpanded">
 
-globalList: {{globalList | async | json}}
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Repository List Title {{state.listExpanded | json}}
+        </mat-panel-title>
+        <mat-panel-description>
+            List of repositories <span *ngIf="!state.listExpanded">&nbsp;- {{state.list.length}} Items</span>
+        </mat-panel-description>
+    </mat-expansion-panel-header>
 
-<ng-container *ngIf="vm.configChanges | async as config">
+    <button mat-raised-button color="primary"
+            (click)="vm.refreshClicks.next($event)">
+        Refresh List
+    </button>
 
-    <div *ngIf="config.list.length; else noList">
-        <mat-selection-list
-                (selectionChange)="vm.selectionChangeObserver.next($event)">
-            <ng-container>
-                <mat-list-option *ngFor="let item of config.list"
-                                 [value]="item"
-                                 [selected]="(vm.selectedOptionsChanges | async)[item.id] === true">
-                    {{item.name}}
-                </mat-list-option>
-            </ng-container>
-        </mat-selection-list>
-        <p>
-            Options selected: {{(vm.selectedOptionsChanges | async | keyvalue).length}}
-        </p>
-    </div>
+    <mat-selection-list
+            (selectionChange)="vm.selectionChanges.next($event)">
+        <ng-container>
+            <mat-list-option *ngFor="let item of state.list"
+                             [value]="item"
+                             [selected]="(vm.selectedOptionsChanges | async)[item.id] === true">
+                {{item.name}}  {{item | json}}
+            </mat-list-option>
+        </ng-container>
+    </mat-selection-list>
+    <p>
+        Options selected: {{(vm.selectedOptionsChanges | async | keyvalue).length}}
+    </p>
 
-    <ng-template #noList>
-        <mat-card>No list given!</mat-card>
-    </ng-template>
-
-</ng-container>
+</mat-expansion-panel>
