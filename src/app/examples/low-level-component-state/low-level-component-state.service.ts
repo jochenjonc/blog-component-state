@@ -14,7 +14,7 @@ export interface SliceConfig {
     endWith?: any,
 }
 
-const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]: number } => ({...acc, [key]: value});
+const stateAccumulator = (acc, command): { [key: string]: number } => ({...acc, ...command});
 
 export class LowLevelStateService implements OnDestroy {
     private subscription = new Subscription();
@@ -24,7 +24,6 @@ export class LowLevelStateService implements OnDestroy {
     state$ = this.stateSubject
         .pipe(
             mergeAll(),
-            map(obj => Object.entries(obj).pop()),
             scan(stateAccumulator, {}),
             publishReplay(1)
         ) as ConnectableObservable<any>;

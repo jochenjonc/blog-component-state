@@ -9,10 +9,11 @@ import {
     MatCardModule,
     MatExpansionModule,
     MatIconModule,
-    MatListModule
+    MatListModule, MatProgressSpinnerModule
 } from "@angular/material";
 import {ArchitectMVCContainerComponent} from "./mcv/mvc-container.component";
 import {SimpleListMVVMComponent} from "./mvvm/simple-list/simple-list.component";
+import {SelectPipe} from "./select.pipe";
 
 export const ROUTES = [
     {
@@ -28,7 +29,8 @@ export const ROUTES = [
 const DECLARATIONS = [
     SimpleListMVVMComponent, ListMVVMComponent,
     ArchitectMVVMContainerComponent,
-     ArchitectMVCContainerComponent
+     ArchitectMVCContainerComponent,
+    SelectPipe
 ];
 export const materialModules = [
     MatIconModule,
@@ -36,7 +38,8 @@ export const materialModules = [
     MatCardModule,
     MatButtonModule,
     MatExpansionModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatProgressSpinnerModule
 ];
 
 @NgModule({

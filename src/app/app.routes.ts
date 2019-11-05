@@ -1,6 +1,5 @@
 import {ROUTES as COLD_COMPOSITION_ROUTES} from "./examples/cold-composition/cold-composition.module";
 import {ROUTES as LATE_SUBSCRIBER_ROUTES} from "./examples/late-subscriber/late-subscriber.module";
-import {ROUTES as REACTIVE_COMPONENT_ARCHITECTURE_ROUTES} from "./examples/reactive-component-architecture/reactive-component-architecture.module";
 import {ROUTES as TIMING_ROUTES} from "./examples/timing/timing.module";
 import {ROUTES as SUBSCRIPTION_HANDLING_ROUTES} from "./examples/subscription-handling/subscription-handling.module";
 import {ROUTES as PROCESS_OVERRIDE_SLICE_ROUTES} from "./examples/process-override-slice/process-override-slice.module";

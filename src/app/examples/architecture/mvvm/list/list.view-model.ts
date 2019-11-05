@@ -1,5 +1,5 @@
-import {Subject} from "rxjs";
-import {map, tap} from "rxjs/operators";
+import {combineLatest, interval, Subject} from "rxjs";
+import {map, scan, startWith, switchMap, take} from "rxjs/operators";
 import {Injectable} from "@angular/core";
 import {LowLevelStateService} from "../../state.service";
 import {IListViewState} from "./list.view-state.interface";
@@ -8,32 +8,62 @@ import {MatSelectionListChange} from "@angular/material";
 
 @Injectable()
 export class ListViewModel extends LowLevelStateService<IListViewState> implements IListView {
+
     // Initial view config
     private initState: IListViewState = {
         listExpanded: true,
         list: [],
-        selectedItems: []
+        selectedItems: [],
+        refreshInterval: 10000,
+        refreshPending: false
     };
+    // IListView (events from the view) =================================================
+    refreshClicks = new Subject<Event>();
+    selectionChanges = new Subject<MatSelectionListChange>();
+    listExpandedChanges = new Subject<boolean>();
 
-    // IListView =================================================
-    selectedOptionsChanges = this.state$
+    // Special vm state derivations
+    // @TODO test selector pipes
+    selectedOptions = this.state$
         .pipe(
             map(s => s.selectedItems
                 .reduce((m, i) => ({...m, [i.id]: true}),
                     {} as { [key: string]: boolean })
             )
         );
-    refreshClicks = new Subject<Event>();
-    selectionChanges = new Subject<MatSelectionListChange>();
-    listExpandedChanges = new Subject<boolean>();
+
+    selectedOptionsMap(s) {
+        return s.selectedItems
+            .reduce((m, i) => ({...m, [i.id]: true}),
+                {} as { [key: string]: boolean })
+    }
+
+    refreshTrigger = combineLatest(
+        this.refreshClicks
+    );
+
+    countDown = combineLatest(
+        this.refreshClicks.pipe(startWith(true)),
+        this.state$.pipe(
+            map(s => s.refreshInterval)
+        )).pipe(
+        switchMap(([e, duration]) => {
+            console.log('duration', duration);
+            return countDown(duration, 40)
+        })
+    );
+
+    selectExpanded(s: IListViewState): boolean {
+        return s.listExpanded
+    }
+
 
     constructor() {
         super();
         this.setSlice(this.initState);
 
-
         this.connectSlice(this.listExpandedChanges
-            .pipe(tap(console.log), map(b => ({listExpanded: b})))
+            .pipe(map(b => ({listExpanded: b})))
         );
 
         this.connectSlice(this.selectionChanges
@@ -47,4 +77,9 @@ export class ListViewModel extends LowLevelStateService<IListViewState> implemen
 
 }
 
-
+export function countDown(duration, samples) {
+    return interval(duration/samples).pipe(
+        scan((count, _) => --count, samples+1),
+        take(samples)
+    )
+}

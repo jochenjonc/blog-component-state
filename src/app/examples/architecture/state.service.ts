@@ -1,6 +1,6 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {ConnectableObservable, merge, Observable, Subject, Subscription} from 'rxjs';
-import {mergeAll, publishReplay, scan} from 'rxjs/operators';
+import {distinctUntilChanged, map, mergeAll, publishReplay, scan} from 'rxjs/operators';
 
 export interface SliceConfig {
     starWith?: any,
@@ -40,6 +40,13 @@ export class LowLevelStateService<T> implements OnDestroy {
 
     connectSlice(o: Observable<T>) {
         this.stateObservables.next(o);
+    }
+    select(selector?): Observable<T>  {
+        return selector ? this.state$
+            .pipe(
+                map(s => selector(s)),
+                distinctUntilChanged()
+            ) : this.state$;
     }
 
     connectEffect(o: Observable<any>) {
