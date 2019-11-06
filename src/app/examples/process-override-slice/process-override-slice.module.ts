@@ -1,20 +1,24 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {ProcessOverrideSliceComponent} from "./process-override-slice.component";
+import {ProcessOverrideSliceContainerComponent} from "./process-override-slice.container.component";
 import {ProcessOverrideSliceBadComponent} from "./process-override-slice-bad.component";
+import {ProcessOverrideSliceGoodComponent} from "./process-override-slice-good.component";
+import {MatButtonModule} from "@angular/material";
 
 export const ROUTES = [
     {
         path: '',
-        component: ProcessOverrideSliceComponent
+        component: ProcessOverrideSliceContainerComponent
     }
 ];
-const DECLARATIONS = [ProcessOverrideSliceComponent, ProcessOverrideSliceBadComponent];
+const DECLARATIONS = [ProcessOverrideSliceContainerComponent,
+    ProcessOverrideSliceBadComponent, ProcessOverrideSliceGoodComponent];
 
 @NgModule({
     declarations: [DECLARATIONS],
     imports: [
-        CommonModule
+        CommonModule,
+        MatButtonModule
     ],
     exports: [DECLARATIONS]
 })

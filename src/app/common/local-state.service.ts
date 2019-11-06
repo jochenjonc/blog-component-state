@@ -10,9 +10,8 @@ export interface SliceConfig {
 const stateAccumulator = (acc, command): { [key: string]: number } => ({...acc, ...command});
 
 @Injectable()
-export class LowLevelStateService<T> implements OnDestroy {
+export class LocalState<T> implements OnDestroy {
     private subscription = new Subscription();
-    private effectSubject = new Subject<Observable<{ [key: string]: number }>>();
     private stateObservables = new Subject<Observable<T>>();
     private stateSlices = new Subject<T>();
     state$: Observable<T> =
@@ -25,32 +24,26 @@ export class LowLevelStateService<T> implements OnDestroy {
             publishReplay(1)
         );
 
-
     constructor() {
         this.subscription.add((this.state$ as ConnectableObservable<any>).connect());
-        this.subscription.add((this.effectSubject
-            .pipe(mergeAll(), publishReplay(1)
-            ) as ConnectableObservable<any>).connect()
-        );
     }
 
-    setSlice(s: T) {
+    setSlice(s: T): void {
         this.stateSlices.next(s);
     }
 
-    connectSlice(o: Observable<T>) {
+    connectSlice(o: Observable<T>): void {
         this.stateObservables.next(o);
     }
+
     select(selector?): Observable<T>  {
         return selector ? this.state$
             .pipe(
                 map(s => selector(s)),
+                // @TODO where to put? .select in the view is meh, and creating multiple properties in vm is not good!
+                // .state$ should be the one source where we get state from
                 distinctUntilChanged()
             ) : this.state$;
-    }
-
-    connectEffect(o: Observable<any>) {
-        this.effectSubject.next(o);
     }
 
     ngOnDestroy(): void {

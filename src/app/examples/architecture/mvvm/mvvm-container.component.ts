@@ -5,12 +5,17 @@ import {Subject} from 'rxjs';
     selector: 'arc-mvvm-container',
     template: `
         <h2>MVVM</h2>
-        <arc-mvvm-simple-list-view>
-        </arc-mvvm-simple-list-view>
-        <arc-mvvm-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
-        </arc-mvvm-list-view>
+        <div class="row">
+            <div class="col">
+                <arc-mvvm-simple-list-view>
+                </arc-mvvm-simple-list-view>
+            </div>
+            <div class="col">
+                <arc-mvvm-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
+                </arc-mvvm-list-view>
+            </div>
+        </div>
         <pre>{{selectedItemIdsObserver | async | json}}</pre>
-        <!--     -->
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -12,12 +12,13 @@ import {
 import {SimpleListItem} from "../../interfaces";
 import {Observable} from "rxjs";
 import {Actions, ofType} from "@ngrx/effects";
+import {LocalEffects} from "../../effect.service";
 
 @Component({
     selector: 'arc-mvvm-list-view',
     templateUrl: './list.view.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [ListViewModel]
+    providers: [ListViewModel, LocalEffects]
 })
 export class ListMVVMComponent {
 
@@ -35,11 +36,12 @@ export class ListMVVMComponent {
         );
 
     // Component-Level Side-Effects
-    refreshClickEffect = this.vm.refreshTrigger
+    refreshTriggerEffect = this.vm.refreshTrigger
         .pipe(tap(_ => this.store.dispatch(fetchRepositoryList({})))
     );
 
     constructor(public vm: ListViewModel,
+                public ef: LocalEffects,
                 private store: Store<any>,
                 private actions$: Actions) {
 
@@ -47,7 +49,7 @@ export class ListMVVMComponent {
         this.vm.connectSlice(this.refreshPending.pipe(map(refreshPending => ({refreshPending}))));
         this.vm.connectSlice(this.globalList.pipe(map(list => ({list}))));
         // register side-effects
-        this.vm.connectEffect(this.refreshClickEffect);
+        this.ef.connectEffect(this.refreshTriggerEffect);
     }
 
     // map RepositoryListItem to ListItem

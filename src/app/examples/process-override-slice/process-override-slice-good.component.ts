@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
-import {timer} from "rxjs";
-import {map} from "rxjs/operators";
-import {ProcessHandlerBadService} from "./process-handler-bad.service";
+import {ProcessHandlerGoodService} from "./process-handler-good.service";
+import {Observable, of, Subject, timer} from "rxjs";
+import {map, switchMap} from "rxjs/operators";
 
 interface ProcessState {
     result1?: number;
@@ -9,7 +9,7 @@ interface ProcessState {
 }
 
 @Component({
-    selector: 'process-override-slice-bad',
+    selector: 'process-override-slice-good',
     template: `
         <p><b>State$:</b></p>
         <button mat-raised-button color="primary"
@@ -28,10 +28,10 @@ interface ProcessState {
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProcessOverrideSliceBadComponent {
+export class ProcessOverrideSliceGoodComponent {
     state$ = this.pH.state$;
 
-    constructor(private pH: ProcessHandlerBadService<ProcessState>) {
+    constructor(private pH: ProcessHandlerGoodService<ProcessState>) {
 
     }
 
@@ -40,5 +40,7 @@ export class ProcessOverrideSliceBadComponent {
             timer(0, tick).pipe(map(c => ({[slice]: c})))
         );
     }
+
+
 
 }

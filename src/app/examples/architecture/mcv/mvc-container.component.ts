@@ -5,8 +5,16 @@ import {BehaviorSubject, Subject} from 'rxjs';
     selector: 'arc-mvc-container',
     template: `
         <h2>MVC</h2>
-        
-        <pre>{{selectedItemIdsObserver | async | json}}</pre>
+        <div class="row">
+            <div class="col">
+                <arc-mvvm-simple-list-view>
+                </arc-mvvm-simple-list-view>
+            </div>
+            <div class="col">
+                <arc-mvvm-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
+                </arc-mvvm-list-view>
+            </div>
+        </div>
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

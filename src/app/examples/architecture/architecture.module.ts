@@ -9,11 +9,13 @@ import {
     MatCardModule,
     MatExpansionModule,
     MatIconModule,
-    MatListModule, MatProgressSpinnerModule
+    MatListModule,
+    MatProgressSpinnerModule
 } from "@angular/material";
 import {ArchitectMVCContainerComponent} from "./mcv/mvc-container.component";
 import {SimpleListMVVMComponent} from "./mvvm/simple-list/simple-list.component";
 import {SelectPipe} from "./select.pipe";
+import {NoMvvmSimpleListComponent} from "./mvvm/no-mvvm-list/no-mvvm.component";
 
 export const ROUTES = [
     {
@@ -24,12 +26,13 @@ export const ROUTES = [
         path: 'mvvm',
         component: ArchitectMVVMContainerComponent
     },
-    { path: 'mvc', component: ArchitectMVCContainerComponent}
+    {path: 'mvc', component: ArchitectMVCContainerComponent}
 ];
 const DECLARATIONS = [
     SimpleListMVVMComponent, ListMVVMComponent,
     ArchitectMVVMContainerComponent,
-     ArchitectMVCContainerComponent,
+    ArchitectMVCContainerComponent,
+    NoMvvmSimpleListComponent,
     SelectPipe
 ];
 export const materialModules = [

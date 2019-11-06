@@ -1,5 +1,9 @@
 # Reactive Component State
 
+@TODOS:
+- 
+- grammarly
+
 <!-- toc -->
 
 - [Timing](#timing)
@@ -25,7 +29,7 @@ Shouldn't FRP be by design timing independent?
 I mean not that there is no time in observables, but when we compose observables we 
 should not care about when any of our state sources exactly emits a value... 
 
-In fact that's the case, in a perfect functional setup we don't need to care about those problems.
+In fact that's the case, in a perfect reactive setup we don't need to care about those problems.
 However, as Angular is an object orientated framework we have to often with different problems related to life-cycles of components and services, router-events and many more things.
 
 In RxJS timing is give by the following:
@@ -96,7 +100,7 @@ export class SubscriptionHandlingComponent implements OnDestroy {
 ```
 
 We already have a declarative subscription handling. 
-But this code could get abstracted way. We could use
+But this code could get moved somewhere else. We could use
 the local service that we most probably will need if we implement
 the final implementation for component state handling.
 
@@ -205,7 +209,7 @@ Another downside is the bundle size of ShareReplay.
 But it will be used anyway somewhere in our architecture, so it's a general downside.
 
 # Sharing references (will not be solved by component-state) 
-
+@TODO Hard rewrite!
 Let me front off explain that this section is specifically here to explain
 why this problem **should not be part of the components state-management**.
 
@@ -241,7 +245,7 @@ An observable for example holds a subscribe method in it
 
 With this in mind let's focus on the original problem, sharing a reference.
 
-In this example we receive a config object from the parent and emit changes from the from created out of the config object.
+In this example we receive a config object from the parent component and emit changes from the formGroup created out of the config object.
 
 Every time we receive a new value from the input binding 
 - we create a config object out of it
@@ -358,19 +362,22 @@ As we will have to deal with:
 - Global State Changes ( http update )
 - Component State Changes ( triggered by button or interval )
 
-Putting all this logic in the component class is a bit messy. 
-We need to provide a **minimal layer of abstraction** that handles composition of all the different sources!
+Putting all this logic in the component class is a bad idea. 
+Not only because of separations of concerns, but also because we would have to implemet it over and over again.
+
+We need to make the logic that deal with problems around composition
+reusable!
 
 So far our sources got subscribed to when the view was ready and we rendered the state.
 As the view represents a hot producer of values and injected services too we have to decouple the service that handles component state from other sources.
 
-So what is the problem?
+So what is the problem?!?!11
 
 We have hot sources and we have to compose them.
 As a minimal requirement to create state we should have at least the last emission of each source to compute a state.
 
 If we compose state we have to consider that every operator returns cold observables.
-(Multi-casting operators are not really operators as they are not compos-able)
+(Operators that return `ConnectableObservable` are not really operators as they are not compos-able)
 
 So no matter what we do before, after an operation we get a cold observable, and we have to subscribe to it to trigger the composition.
 I call this situation cold composition, as with selector functions in i.e. publish we are also able to create hot compositions.

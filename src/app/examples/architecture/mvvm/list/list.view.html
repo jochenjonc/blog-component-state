@@ -1,18 +1,18 @@
 <!-- NOTE: in the view the only variable we want to touch is `vm`-->
 <h3>List Component</h3>
 <mat-expansion-panel
-        *ngIf="vm.select() | async as state"
+        *ngIf="vm.state$ | async as state"
         (expandedChange)="vm.listExpandedChanges.next($event)"
         [expanded]="state.listExpanded">
 
     <mat-expansion-panel-header>
         <mat-panel-title style="width: 30%;">
-            Repository List Title
+            User Name
             <mat-spinner style="margin-left: 15px" *ngIf="state.refreshPending" diameter="20" strokeWidth="3"></mat-spinner>
         </mat-panel-title>
         <mat-panel-description>
-            List of repositories
-            <span *ngIf="!state.listExpanded">&nbsp;- {{state.list.length}} Items</span>
+            <span *ngIf="!state.listExpanded">{{state.selectedItems.length}} / {{state.list.length}}</span>
+            <span *ngIf="state.listExpanded">{{state.selectedItems.length}} / {{state.list.length}} Selected</span>
         </mat-panel-description>
     </mat-expansion-panel-header>
 
@@ -27,7 +27,7 @@
             <mat-list-option *ngFor="let item of state.list"
                              [value]="item"
                              [selected]="(vm.selectedOptions | async)[item.id] === true">
-                {{item.name}}  {{item | json}}
+                {{item.name}}
             </mat-list-option>
         </ng-container>
     </mat-selection-list>

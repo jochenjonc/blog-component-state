@@ -21,6 +21,9 @@
     "paths": {
       "@data-access/github": [
         "src/app/data-access/github"
+      ],
+      "@common": [
+        "src/app/common"
       ]
     }
   },
