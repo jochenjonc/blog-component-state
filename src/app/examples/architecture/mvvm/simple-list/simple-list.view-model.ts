@@ -3,10 +3,10 @@ import {map} from "rxjs/operators";
 import {Injectable} from "@angular/core";
 import {ISimpleListView} from "./simple-list.view.interface";
 import {ISimpleListVMState} from "./simple-list.view-model.interface";
-import {LowLevelStateService} from "../../state.service";
+import {LocalState} from "@common";
 
 @Injectable()
-export class SimpleListViewModel extends LowLevelStateService<ISimpleListVMState> implements ISimpleListView {
+export class SimpleListViewModel extends LocalState<ISimpleListVMState> implements ISimpleListView {
     // Initial view config
     initState: ISimpleListVMState = {
         listExpanded: false,

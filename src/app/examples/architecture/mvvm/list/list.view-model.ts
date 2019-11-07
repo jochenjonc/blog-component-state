@@ -1,15 +1,15 @@
 import {combineLatest, interval, Subject} from "rxjs";
 import {map, scan, startWith, switchMap, take} from "rxjs/operators";
 import {Injectable} from "@angular/core";
-import {IListViewState} from "./list.view-state.interface";
+import {IListViewModelState} from "./list.view-model-state.interface";
 import {IListView} from "./list.view.interface";
 import {MatSelectionListChange} from "@angular/material";
 import {LocalState} from '@common';
 @Injectable()
-export class ListViewModel extends LocalState<IListViewState> implements IListView {
+export class ListViewModel extends LocalState<IListViewModelState> implements IListView {
 
     // Initial view config
-    private initState: IListViewState = {
+    private initState: IListViewModelState = {
         listExpanded: true,
         list: [],
         selectedItems: [],
@@ -52,7 +52,7 @@ export class ListViewModel extends LocalState<IListViewState> implements IListVi
         })
     );
 
-    selectExpanded(s: IListViewState): boolean {
+    selectExpanded(s: IListViewModelState): boolean {
         return s.listExpanded
     }
 

@@ -12,6 +12,7 @@ const stateAccumulator = (acc, command): { [key: string]: number } => ({...acc, 
 @Injectable()
 export class LocalState<T> implements OnDestroy {
     private subscription = new Subscription();
+    private effectSubject = new Subject<Observable<{ [key: string]: number }>>();
     private stateObservables = new Subject<Observable<T>>();
     private stateSlices = new Subject<T>();
     state$: Observable<T> =
@@ -26,6 +27,10 @@ export class LocalState<T> implements OnDestroy {
 
     constructor() {
         this.subscription.add((this.state$ as ConnectableObservable<any>).connect());
+        this.subscription.add((this.effectSubject
+            .pipe(mergeAll(), publishReplay(1)
+            ) as ConnectableObservable<any>).connect()
+        );
     }
 
     setSlice(s: T): void {
@@ -35,6 +40,11 @@ export class LocalState<T> implements OnDestroy {
     connectSlice(o: Observable<T>): void {
         this.stateObservables.next(o);
     }
+
+    connectEffect(o: Observable<any>) {
+        this.effectSubject.next(o);
+    }
+
 
     select(selector?): Observable<T>  {
         return selector ? this.state$

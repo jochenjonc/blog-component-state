@@ -12,7 +12,7 @@ import {
 import {SimpleListItem} from "../../interfaces";
 import {Observable} from "rxjs";
 import {Actions, ofType} from "@ngrx/effects";
-import {LocalEffects} from "../../effect.service";
+import {LocalEffects} from "@common";
 
 @Component({
     selector: 'arc-mvvm-list-view',
