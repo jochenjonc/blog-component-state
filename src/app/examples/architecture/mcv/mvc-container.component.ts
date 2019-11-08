@@ -7,12 +7,12 @@ import {BehaviorSubject, Subject} from 'rxjs';
         <h2>MVC</h2>
         <div class="row">
             <div class="col">
-                <arc-mvvm-simple-list-view>
-                </arc-mvvm-simple-list-view>
+                <arc-mvc-simple-list-view>
+                </arc-mvc-simple-list-view>
             </div>
             <div class="col">
-                <arc-mvvm-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
-                </arc-mvvm-list-view>
+         <!--       <arc-mvc-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
+                </arc-mvc-list-view> -->
             </div>
         </div>
     `,
