@@ -1,18 +1,18 @@
 <!-- NOTE: in the view the only variable we want to touch is `vm`-->
 <h3>List Component</h3>
 <mat-expansion-panel
-        *ngIf="vm.state$ | async as state"
+        *ngIf="vm.state$ | async as m"
         (expandedChange)="vm.listExpandedChanges.next($event)"
-        [expanded]="state.listExpanded">
+        [expanded]="m.listExpanded">
 
     <mat-expansion-panel-header>
         <mat-panel-title style="width: 30%;">
             User Name
-            <mat-spinner style="margin-left: 15px" *ngIf="state.refreshPending" diameter="20" strokeWidth="3"></mat-spinner>
+            <mat-spinner style="margin-left: 15px" *ngIf="m.refreshPending" diameter="20" strokeWidth="3"></mat-spinner>
         </mat-panel-title>
         <mat-panel-description>
-            <span *ngIf="!state.listExpanded">{{state.selectedItems.length}} / {{state.list.length}}</span>
-            <span *ngIf="state.listExpanded">{{state.selectedItems.length}} / {{state.list.length}} Selected</span>
+            <span *ngIf="!m.listExpanded">{{m.selectedItems.length}} / {{m.list.length}}</span>
+            <span *ngIf="m.listExpanded">{{m.selectedItems.length}} / {{m.list.length}} Selected</span>
         </mat-panel-description>
     </mat-expansion-panel-header>
 
@@ -24,7 +24,7 @@
     <mat-selection-list
             (selectionChange)="vm.selectionChanges.next($event)">
         <ng-container>
-            <mat-list-option *ngFor="let item of state.list"
+            <mat-list-option *ngFor="let item of m.list"
                              [value]="item"
                              [selected]="(vm.selectedOptions | async)[item.id] === true">
                 {{item.name}}

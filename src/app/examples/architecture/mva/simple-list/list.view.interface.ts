@@ -8,7 +8,4 @@ export interface IListView {
     // Needed to set selected state
     listExpandedChanges: Subject<boolean>
     // Observe changes to set selected state
-    selectionChanges: Observer<MatSelectionListChange>;
-    // Model derivations just for view
-   // selectedOptions: Observable<{[key: string]: boolean}>;
 }

@@ -31,12 +31,6 @@ export class ListViewModel extends LocalState<IListViewModelState> implements IL
             )
         );
 
-    selectedOptionsMap(s) {
-        return s.selectedItems
-            .reduce((m, i) => ({...m, [i.id]: true}),
-                {} as { [key: string]: boolean })
-    }
-
     refreshTrigger = combineLatest(
         this.refreshClicks
     );
@@ -51,11 +45,6 @@ export class ListViewModel extends LocalState<IListViewModelState> implements IL
             return countDown(duration, 40)
         })
     );
-
-    selectExpanded(s: IListViewModelState): boolean {
-        return s.listExpanded
-    }
-
 
     constructor() {
         super();

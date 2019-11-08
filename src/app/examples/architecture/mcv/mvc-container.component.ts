@@ -11,7 +11,7 @@ import {BehaviorSubject, Subject} from 'rxjs';
                 </arc-mvc-simple-list-view>
             </div>
             <div class="col">
-            <arc-mvc-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
+                <arc-mvc-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
                 </arc-mvc-list-view>
             </div>
         </div>
@@ -23,7 +23,7 @@ export class ArchitectMVCContainerComponent {
         list: [],
         selectedItemIds: []
     };
-    configChanges =  new BehaviorSubject<any>(this.config);
+    configChanges = new BehaviorSubject<any>(this.config);
 
     selectedItemIdsObserver = new Subject<string[]>();
 

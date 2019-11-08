@@ -1,7 +1,8 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {SimpleListModel} from './simple-list.model';
 import {SimpleListView} from "./simple-list.view";
-import {map, tap} from "rxjs/operators";
+import {map, scan, take, tap} from "rxjs/operators";
+import {interval} from "rxjs";
 
 @Component({
     selector: 'arc-mvc-simple-list-view',
@@ -11,15 +12,14 @@ import {map, tap} from "rxjs/operators";
 })
 export class SimpleListMVCComponent {
 
-    constructor(private v: SimpleListView,
-                private m: SimpleListModel) {
+    constructor(public v: SimpleListView,
+                public m: SimpleListModel) {
         // Connect Model
         this.m.connectSlice(this.v.listExpandedChanges
             .pipe(map(listExpanded => ({listExpanded}))));
         // Register Side-Effects
         this.m.connectEffect(this.v.refreshClicks
             .pipe(tap(_ => this.m.refreshRequest.next(true))));
-
     }
 
 }

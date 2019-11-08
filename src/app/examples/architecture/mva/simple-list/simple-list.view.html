@@ -1,27 +1,27 @@
 <h3>Simple List Component</h3>
 <mat-expansion-panel
-        *ngIf="vm.state$ | async as m"
-        (expandedChange)="vm.listExpandedChanges.next($event)"
-        [expanded]="m.listExpanded">
+        *ngIf="state$ | async as state"
+        (expandedChange)="listExpandedChanges.next($event)"
+        [expanded]="state.listExpanded">
     <mat-expansion-panel-header>
         <mat-panel-title>
             User Name
         </mat-panel-title>
         <mat-panel-description>
-            <span *ngIf="!m.listExpanded">{{m.list.length}} Repositories</span>
-            <span *ngIf="m.listExpanded">{{m.list.length}}</span>
+            <span *ngIf="!state.listExpanded">{{state.list.length}} Repositories</span>
+            <span *ngIf="state.listExpanded">{{state.list.length}}</span>
         </mat-panel-description>
     </mat-expansion-panel-header>
 
     <!-- NOTE: in the view the only variable we want to touch is `vm`-->
     <button mat-raised-button color="primary"
-            (click)="vm.refreshClicks.next($event)">
+            (click)="refreshClicks.next($event)">
         Refresh List
     </button>
 
-    <div *ngIf="m.list.length; else noList">
+    <div *ngIf="state.list.length; else noList">
         <mat-list>
-            <mat-list-item *ngFor="let item of m.list">
+            <mat-list-item *ngFor="let item of state.list">
                 {{item.name}}
             </mat-list-item>
         </mat-list>

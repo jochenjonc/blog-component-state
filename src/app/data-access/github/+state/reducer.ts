@@ -6,9 +6,11 @@ import {getData} from '../github.service';
 export const GITHUB_FEATURE_KEY = 'github';
 
 export interface GitHubState {
+    user: string,
     list: RepositoryListItem[]
 }
 const initialGitHubState = {
+    user: 'ReactiveX',
     list: getData()
 };
 

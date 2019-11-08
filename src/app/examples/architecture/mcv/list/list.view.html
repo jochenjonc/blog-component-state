@@ -1,38 +1,37 @@
 <!-- NOTE: in the view the only variable we want to touch is `vm`-->
 <h3>List Component</h3>
 <mat-expansion-panel
-        *ngIf="vm.state$ | async as state"
-        (expandedChange)="vm.listExpandedChanges.next($event)"
-        [expanded]="state.listExpanded">
+        *ngIf="m.state$ | async as s"
+        (expandedChange)="v.listExpandedChanges.next($event)"
+        [expanded]="s.listExpanded">
 
     <mat-expansion-panel-header>
         <mat-panel-title style="width: 30%;">
             User Name
-            <mat-spinner style="margin-left: 15px" *ngIf="state.refreshPending" diameter="20" strokeWidth="3"></mat-spinner>
+            <mat-spinner style="margin-left: 15px" *ngIf="s.refreshPending" diameter="20" strokeWidth="3"></mat-spinner>
         </mat-panel-title>
         <mat-panel-description>
-            <span *ngIf="!state.listExpanded">{{state.selectedItems.length}} / {{state.list.length}}</span>
-            <span *ngIf="state.listExpanded">{{state.selectedItems.length}} / {{state.list.length}} Selected</span>
+            <span *ngIf="!s.listExpanded">{{s.selectedItems.length}} / {{s.list.length}}</span>
+            <span *ngIf="s.listExpanded">{{s.selectedItems.length}} / {{s.list.length}} Selected</span>
         </mat-panel-description>
     </mat-expansion-panel-header>
 
     <button mat-raised-button color="primary"
-            (click)="vm.refreshClicks.next($event)">
+            (click)="v.refreshClicks.next($event)">
         Refresh List
     </button>
 
     <mat-selection-list
-            (selectionChange)="vm.selectionChanges.next($event)">
+            (selectionChange)="v.selectionChanges.next($event)">
         <ng-container>
-            <mat-list-option *ngFor="let item of state.list"
+            <mat-list-option *ngFor="let item of s.list"
                              [value]="item"
-                             [selected]="(vm.selectedOptions | async)[item.id] === true">
+                             [selected]="(m.selectedOptions | async)[item.id] === true">
                 {{item.name}}
             </mat-list-option>
         </ng-container>
     </mat-selection-list>
     <p>
-        Options selected: {{(vm.selectedOptions | async | keyvalue).length}}
+        Options selected: {{(m.selectedOptions | async | keyvalue).length}}
     </p>
-
 </mat-expansion-panel>

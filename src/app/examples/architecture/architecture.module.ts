@@ -19,6 +19,8 @@ import {NoArchitectureContainerComponent} from "./no-architecture/no-architectur
 import {SimpleListNoArchitectureComponent} from "./no-architecture/simple-list/simple-list.component";
 import {SimpleListMVCComponent} from "./mcv/simple-list/simple-list.component";
 import {ListMVCComponent} from "./mcv/list/list.component";
+import {ArchitectMVAContainerComponent } from "./mva/mva-container.component";
+import {SimpleListMVAComponent} from "./mva/simple-list/simple-list.component";
 
 
 export const ROUTES = [
@@ -26,20 +28,21 @@ export const ROUTES = [
         path: '',
         component: ArchitectureOverviewComponent
     },
-    {
-        path: 'mvvm',
-        component: ArchitectMVVMContainerComponent
-    },
+    {path: 'mvvm', component: ArchitectMVVMContainerComponent},
     {path: 'mvc', component: ArchitectMVCContainerComponent},
+    {path: 'mva', component: ArchitectMVAContainerComponent},
     {path: 'no-architecture', component: NoArchitectureContainerComponent}
 ];
 const DECLARATIONS = [
+    ArchitectureOverviewComponent,
+    SimpleListNoArchitectureComponent,
+    NoArchitectureContainerComponent,
     SimpleListMVVMComponent, ListMVVMComponent,
     ArchitectMVVMContainerComponent,
-    ArchitectMVCContainerComponent,
-    NoArchitectureContainerComponent,
-    SimpleListNoArchitectureComponent,
     SimpleListMVCComponent, ListMVCComponent,
+    ArchitectMVCContainerComponent,
+    SimpleListMVAComponent,
+    ArchitectMVAContainerComponent,
     SelectPipe
 ];
 export const materialModules = [
