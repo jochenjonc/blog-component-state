@@ -11,8 +11,8 @@ import {BehaviorSubject, Subject} from 'rxjs';
                 </arc-mvc-simple-list-view>
             </div>
             <div class="col">
-         <!--       <arc-mvc-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
-                </arc-mvc-list-view> -->
+            <arc-mvc-list-view (selectionChanges)="selectedItemIdsObserver.next($event)">
+                </arc-mvc-list-view>
             </div>
         </div>
     `,

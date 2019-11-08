@@ -13,9 +13,10 @@ export class SimpleListMVCComponent {
 
     constructor(private v: SimpleListView,
                 private m: SimpleListModel) {
-
+        // Connect Model
         this.m.connectSlice(this.v.listExpandedChanges
             .pipe(map(listExpanded => ({listExpanded}))));
+        // Register Side-Effects
         this.m.connectEffect(this.v.refreshClicks
             .pipe(tap(_ => this.m.refreshRequest.next(true))));
 
