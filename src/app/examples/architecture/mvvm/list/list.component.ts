@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, Output} from '@angular/core';
 import {ListViewModel} from './list.view-model';
 import {Store} from "@ngrx/store";
-import {map, tap} from "rxjs/operators";
+import {endWith, map, scan, startWith, switchMap, switchMapTo, takeUntil, tap, withLatestFrom} from "rxjs/operators";
 import {
     fetchRepositoryList,
     repositoryListFetchError,
@@ -10,38 +10,46 @@ import {
     selectGitHubList
 } from "@data-access/github";
 import {SimpleListItem} from "../../interfaces";
-import {Observable} from "rxjs";
+import {BehaviorSubject, combineLatest, interval, merge, Observable, ReplaySubject, timer} from "rxjs";
 import {Actions, ofType} from "@ngrx/effects";
-import {LocalEffects} from "@common";
+
 
 @Component({
     selector: 'arc-mvvm-list-view',
     templateUrl: './list.view.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [ListViewModel, LocalEffects]
+    providers: [ListViewModel]
 })
 export class ListMVVMComponent {
+
+    defaultRefreshDuration = 1000 * 10;
+    refreshDurationChange = new BehaviorSubject(this.defaultRefreshDuration);
+    @Input()
+    set refreshDuration(interval: number) {
+        if(interval) {
+            this.refreshDurationChange.next(interval)
+        }
+    }
 
     @Output()
     selectionChanges: Observable<string[]> = this.vm.state$
         .pipe(map(s => s.selectedItems.map(i => i.id)));
 
     // State from outer sources
-    globalList = this.store
+    private globalList = this.store
          .select(selectGitHubList).pipe(map(this.parseSimpleListItems), tap(l =>  console.log('list global', l)));
-    refreshPending = this.actions$
+    private refreshPending = this.actions$
         .pipe(
             ofType(fetchRepositoryList, repositoryListFetchError,repositoryListFetchSuccess),
             map(a => a.type === fetchRepositoryList.type)
         );
 
     // Component-Level Side-Effects
-    refreshTriggerEffect = this.vm.refreshTrigger
+    private refreshTriggerEffect = this.vm.refreshTrigger
         .pipe(tap(_ => this.store.dispatch(fetchRepositoryList({})))
     );
 
     constructor(public vm: ListViewModel,
-                public ef: LocalEffects,
                 private store: Store<any>,
                 private actions$: Actions) {
 
@@ -49,11 +57,11 @@ export class ListMVVMComponent {
         this.vm.connectSlice(this.refreshPending.pipe(map(refreshPending => ({refreshPending}))));
         this.vm.connectSlice(this.globalList.pipe(map(list => ({list}))));
         // register side-effects
-        this.ef.connectEffect(this.refreshTriggerEffect);
+        this.vm.connectEffect(this.refreshTriggerEffect);
     }
 
     // map RepositoryListItem to ListItem
-    parseSimpleListItems(l: RepositoryListItem[]): SimpleListItem[] {
+    private parseSimpleListItems(l: RepositoryListItem[]): SimpleListItem[] {
         return l.map(({id, name}) => ({id, name}))
     }
 

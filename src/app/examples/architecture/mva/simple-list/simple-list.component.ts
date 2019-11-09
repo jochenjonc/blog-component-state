@@ -18,7 +18,7 @@ export class SimpleListMVAComponent {
     refreshClicks = new Subject<Event>();
     listExpandedChanges = new Subject<boolean>();
 
-    constructor(private a:SimpleListAdapter) {
+    constructor(public a:SimpleListAdapter) {
         this.a.connectSlice(this.listExpandedChanges
             .pipe(map(b => ({listExpanded: b})))
         );

@@ -9,7 +9,7 @@ import {
     MatCardModule,
     MatExpansionModule,
     MatIconModule,
-    MatListModule,
+    MatListModule, MatProgressBarModule,
     MatProgressSpinnerModule
 } from "@angular/material";
 import {ArchitectMVCContainerComponent} from "./mcv/mvc-container.component";
@@ -21,6 +21,7 @@ import {SimpleListMVCComponent} from "./mcv/simple-list/simple-list.component";
 import {ListMVCComponent} from "./mcv/list/list.component";
 import {ArchitectMVAContainerComponent } from "./mva/mva-container.component";
 import {SimpleListMVAComponent} from "./mva/simple-list/simple-list.component";
+import {SimpleListNoArchitectureImpComponent} from "./no-architecture/simple-list-imp/simple-list-imp.component";
 
 
 export const ROUTES = [
@@ -35,7 +36,7 @@ export const ROUTES = [
 ];
 const DECLARATIONS = [
     ArchitectureOverviewComponent,
-    SimpleListNoArchitectureComponent,
+    SimpleListNoArchitectureComponent, SimpleListNoArchitectureImpComponent,
     NoArchitectureContainerComponent,
     SimpleListMVVMComponent, ListMVVMComponent,
     ArchitectMVVMContainerComponent,
@@ -52,7 +53,8 @@ export const materialModules = [
     MatButtonModule,
     MatExpansionModule,
     MatBadgeModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatProgressBarModule
 ];
 
 @NgModule({

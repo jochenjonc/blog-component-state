@@ -1,7 +1,6 @@
 <h3>Simple List Component</h3>
 <mat-expansion-panel
-        *ngIf="a.state$ | async as state"
-        (expandedChange)="listExpandedChanges.next($event)"
+        (expandedChange)="onListExpandedChanges($event)"
         [expanded]="state.listExpanded">
     <mat-expansion-panel-header>
         <mat-panel-title>
@@ -15,7 +14,7 @@
 
     <!-- NOTE: in the view the only variable we want to touch is `vm`-->
     <button mat-raised-button color="primary"
-            (click)="refreshClicks.next($event)">
+            (click)="onRefreshClickEffect()">
         Refresh List
     </button>
 

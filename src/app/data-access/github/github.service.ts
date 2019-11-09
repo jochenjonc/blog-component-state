@@ -10,13 +10,11 @@ import {delay} from "rxjs/operators";
 export class GitHubService {
 
     constructor(private http: HttpClient) {
-
     }
 
-    getData = (arg?: any) => of(getData(arg)).pipe(delay(~~(Math.random()*1000)));
+    getData = (arg?: any) => of(getData(arg)).pipe(delay(~~(Math.random()*5000)));
 
 }
-
 
 export function getData(cfg = {num: 5}): RepositoryListItem[] {
     const randId = (s: string) => s + ~~(Math.random() * 100);

@@ -46,7 +46,7 @@ export class LocalState<T> implements OnDestroy {
     }
 
 
-    select(selector?): Observable<T>  {
+    select(selector?) {
         return selector ? this.state$
             .pipe(
                 map(s => selector(s)),

@@ -23,6 +23,7 @@ import {ListView} from "./list.view";
 })
 export class ListMVCComponent {
 
+
     @Output()
     selectionChanges: Observable<string[]> = this.m.state$
         .pipe(map(s => s.selectedItems.map(i => i.id)));
@@ -40,7 +41,6 @@ export class ListMVCComponent {
                 map(selectedItems => ({selectedItems}))
             )
         );
-
         // Register Side-Effects
         this.m.connectEffect(this.v.refreshClicks
             .pipe(tap(_ => this.store.dispatch(fetchRepositoryList({})))));

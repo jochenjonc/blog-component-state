@@ -4,6 +4,6 @@ export interface IListViewModelState {
     list?: SimpleListItem[],
     selectedItems?: SimpleListItem[],
     listExpanded?: boolean;
-    refreshInterval?: number;
+    refreshPeriod?: number;
     refreshPending?: boolean;
 }

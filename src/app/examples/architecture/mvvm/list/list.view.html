@@ -1,14 +1,28 @@
 <!-- NOTE: in the view the only variable we want to touch is `vm`-->
+<style>
+    .list .mat-expansion-panel-header {
+        position: relative;
+    }
+    .list .mat-expansion-panel-header mat-progress-bar {
+        position: absolute;
+        top: 0px;
+        left: 0;
+    }
+
+    .list .mat-expansion-panel-content .mat-expansion-panel-body {
+          padding-top: 10px;
+    }
+</style>
 <h3>List Component</h3>
 <mat-expansion-panel
+        class="list"
         *ngIf="vm.state$ | async as m"
         (expandedChange)="vm.listExpandedChanges.next($event)"
         [expanded]="m.listExpanded">
-
-    <mat-expansion-panel-header>
+    <mat-expansion-panel-header style="position: relative">
+        <mat-progress-bar [mode]="m.refreshPending ? 'query' : 'determinate'" [value]="vm.countDownOutput$ | async"></mat-progress-bar>
         <mat-panel-title style="width: 30%;">
             User Name
-            <mat-spinner style="margin-left: 15px" *ngIf="m.refreshPending" diameter="20" strokeWidth="3"></mat-spinner>
         </mat-panel-title>
         <mat-panel-description>
             <span *ngIf="!m.listExpanded">{{m.selectedItems.length}} / {{m.list.length}}</span>
@@ -20,7 +34,6 @@
             (click)="vm.refreshClicks.next($event)">
         Refresh List
     </button>
-
     <mat-selection-list
             (selectionChange)="vm.selectionChanges.next($event)">
         <ng-container>
