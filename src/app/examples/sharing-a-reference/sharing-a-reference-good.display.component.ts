@@ -1,7 +1,6 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, Input, Output} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {ActivatedRoute} from '@angular/router';
-import {combineLatest, Observable, ReplaySubject} from 'rxjs';
+import {Observable, ReplaySubject} from 'rxjs';
 import {map, shareReplay, startWith, switchMap} from 'rxjs/operators';
 
 @Component({
@@ -19,17 +18,19 @@ import {map, shareReplay, startWith, switchMap} from 'rxjs/operators';
 export class SharingAReferenceGoodDisplayComponent {
     state$ = new ReplaySubject(1);
 
+    @Input()
+    set formGroupModel(modelFromInput: { [key: string]: any }) {
+        if (modelFromInput) {
+            this.state$.next(modelFromInput);
+        }
+    }
+
     formGroup$: Observable<FormGroup> = this.state$
         .pipe(
             startWith({}),
             map(input => this.getFormGroupFromConfig(input)),
             shareReplay(1)
         );
-
-    @Input()
-    set formGroupModel(value) {
-        this.state$.next(value);
-    }
 
     @Output() formValueChange = this.formGroup$
         .pipe(switchMap((fg: FormGroup) => fg.valueChanges));

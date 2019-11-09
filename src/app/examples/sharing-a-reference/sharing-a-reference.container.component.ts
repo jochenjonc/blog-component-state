@@ -7,25 +7,33 @@ import {of, Subject} from 'rxjs';
         <p><b>formGroupModel$:</b></p>
         <pre>{{formGroupModel$ | async | json}}</pre>
         <hr/>
-        <p><b>formValue1$:</b></p>
-        <pre>{{formValue1$ | async | json}}</pre>
+        <p><b>imperative version:</b></p>
+        <pre>{{imp$ | async | json}}</pre>
+        <sharing-a-reference-imp-display
+                [formGroupModel]="formGroupModel$ | async"
+                (formValueChange)="imp$.next($event)">
+        </sharing-a-reference-imp-display>
+        <hr/>
+        <p><b>reactive bad version:</b></p>
+        <pre>{{reactiveBad$ | async | json}}</pre>
         <sharing-a-reference-bad-display
                 [formGroupModel]="formGroupModel$ | async"
-                (formValueChange)="formValue1$.next($event)">
+                (formValueChange)="reactiveBad$.next($event)">
         </sharing-a-reference-bad-display>
         <hr/>
-        <p><b>formValue2$:</b></p>
-        <pre>{{formValue2$ | async | json}}</pre>
+        <p><b>reactiveGood$:</b></p>
+        <pre>{{reactiveGood$ | async | json}}</pre>
         <sharing-a-reference-good-display
                 [formGroupModel]="formGroupModel$ | async"
-                (formValueChange)="formValue2$.next($event)">
+                (formValueChange)="reactiveGood$.next($event)">
         </sharing-a-reference-good-display>
     `
 })
 export class SharingAReferenceContainerComponent {
 
-    formValue1$ = new Subject();
-    formValue2$ = new Subject();
+    imp$ = new Subject();
+    reactiveBad$ = new Subject();
+    reactiveGood$ = new Subject();
 
     formGroupModel$ = of({
         name: '',

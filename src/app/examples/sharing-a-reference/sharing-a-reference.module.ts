@@ -4,6 +4,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 import {SharingAReferenceBadDisplayComponent} from "./sharing-a-reference-bad.display.component";
 import {SharingAReferenceGoodDisplayComponent} from "./sharing-a-reference-good.display.component";
 import {SharingAReferenceContainerComponent} from "./sharing-a-reference.container.component";
+import {SharingAReferenceImpDisplayComponent} from "./sharing-a-reference-imp.display.component";
 
 export const ROUTES = [
     {
@@ -11,7 +12,7 @@ export const ROUTES = [
         component: SharingAReferenceContainerComponent
     }
 ];
-const DECLARATIONS = [SharingAReferenceContainerComponent, SharingAReferenceBadDisplayComponent, SharingAReferenceGoodDisplayComponent];
+const DECLARATIONS = [SharingAReferenceContainerComponent, SharingAReferenceBadDisplayComponent, SharingAReferenceGoodDisplayComponent, SharingAReferenceImpDisplayComponent];
 
 @NgModule({
     declarations: [DECLARATIONS],

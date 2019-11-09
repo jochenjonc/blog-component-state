@@ -6,28 +6,29 @@ import {map, startWith, switchMap} from 'rxjs/operators';
 @Component({
     selector: 'sharing-a-reference-bad-display',
     template: `
-        <h2>Sharing a reference Bad</h2>
-        <form *ngIf="(formGroup$ | async) as formGroup" [formGroup]="formGroup">
-            <div *ngFor="let c of formGroup.controls | keyvalue">
-                <label>{{c.key}}</label>
-                <input [formControlName]="c.key"/>
-            </div>
-        </form>
+    <h2>Sharing a reference Bad</h2>
+    <form *ngIf="(formGroup$ | async) as formGroup" [formGroup]="formGroup">
+        <div *ngFor="let c of formGroup.controls | keyvalue">
+            <label>{{c.key}}</label>
+            <input [formControlName]="c.key"/>
+        </div>
+    </form>
     `
 })
 export class SharingAReferenceBadDisplayComponent {
     state$ = new ReplaySubject(1);
+    @Input()
+    set formGroupModel(modelFromInput: { [key: string]: any }) {
+        if (modelFromInput) {
+            this.state$.next(modelFromInput);
+        }
+    }
 
-    formGroup$: Observable<FormGroup> = this.state$
+    formGroup$: Observable<FormGroup>  = this.state$
         .pipe(
             startWith({}),
             map(input => this.getFormGroupFromConfig(input))
         );
-
-    @Input()
-    set formGroupModel(value) {
-        this.state$.next(value);
-    }
 
     @Output() formValueChange = this.formGroup$
         .pipe(switchMap((fg: FormGroup) => fg.valueChanges));
