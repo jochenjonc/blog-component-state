@@ -34,7 +34,7 @@ export class ListModel extends LocalState<IListModelState> {
             map(a => a.type === fetchRepositoryList.type)
         );
 
-    selectedOptions: Observable<{ [key: string]: boolean; }> = this.state$
+    selectedOptions: Observable<{ [key: string]: boolean; }> = this.select()
         .pipe(
             map(s => s.selectedItems
                 .reduce((m, i) => ({...m, [i.id]: true}),
@@ -45,9 +45,9 @@ export class ListModel extends LocalState<IListModelState> {
     constructor(  private store: Store<any>,
                   private actions$: Actions) {
         super();
-        this.setSlice(this.initState);
-        this.connectSlice(this.refreshPending.pipe(map(refreshPending => ({refreshPending}))));
-        this.connectSlice(this.globalList.pipe(map(list => ({list}))));
+        this.setState(this.initState);
+        this.connectState(this.refreshPending.pipe(map(refreshPending => ({refreshPending}))));
+        this.connectState(this.globalList.pipe(map(list => ({list}))));
     }
 
     // map RepositoryListItem to ListItem

@@ -15,7 +15,7 @@ export class SimpleListMVCComponent {
     constructor(public v: SimpleListView,
                 public m: SimpleListModel) {
         // Connect Model
-        this.m.connectSlice(this.v.listExpandedChanges
+        this.m.connectState(this.v.listExpandedChanges
             .pipe(map(listExpanded => ({listExpanded}))));
         // Register Side-Effects
         this.m.connectEffect(this.v.refreshClicks

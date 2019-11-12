@@ -22,6 +22,8 @@ export class SimpleListNoArchitectureComponent
         list: []
     };
 
+    state$ = this.select();
+
     // IListView =================================================
     refreshClicks = new Subject<Event>();
     listExpandedChanges = new Subject<boolean>();
@@ -37,12 +39,12 @@ export class SimpleListNoArchitectureComponent
 
     constructor(private store: Store<any>) {
         super();
-        this.setSlice(this.initState);
+        this.setState(this.initState);
 
-        this.connectSlice(this.listExpandedChanges
+        this.connectState(this.listExpandedChanges
             .pipe(map(b => ({listExpanded: b})))
         );
-        this.connectSlice(this.globalList
+        this.connectState(this.globalList
             .pipe(map(list => ({list})))
         );
 

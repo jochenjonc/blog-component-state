@@ -1,13 +1,6 @@
-import {Injectable, OnDestroy} from '@angular/core';
-import {
-    animationFrameScheduler,
-    ConnectableObservable,
-    Observable,
-    OperatorFunction,
-    Subject,
-    Subscription
-} from 'rxjs';
-import {distinctUntilChanged, map, mergeAll, observeOn, publishReplay, scan, takeUntil} from 'rxjs/operators';
+import {OnDestroy} from '@angular/core';
+import {ConnectableObservable, Observable, Subject, Subscription} from 'rxjs';
+import {map, mergeAll, publishReplay, scan} from 'rxjs/operators';
 
 export interface SliceConfig {
     starWith?: any,

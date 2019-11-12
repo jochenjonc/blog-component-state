@@ -27,13 +27,14 @@ export class ListViewModel extends LocalState<IListViewModelState> implements IL
         refreshPeriod: 1000 * 20,
         refreshPending: false
     };
+    state$ = this.select();
     // IListView (events from the view) =================================================
     refreshClicks = new Subject<Event>();
     selectionChanges = new Subject<MatSelectionListChange>();
     listExpandedChanges = new Subject<boolean>();
 
     // Special vm state derivations
-    selectedOptions = this.state$
+    selectedOptions = this.select()
         .pipe(map(s => toIdMap(s.selectedItems)));
 
     private idleRefreshClicks = this.refreshClicks.pipe(
@@ -42,13 +43,13 @@ export class ListViewModel extends LocalState<IListViewModelState> implements IL
     );
     private refreshInterval = combineLatest(
         this.idleRefreshClicks.pipe(startWith(0)),
-        this.select(s => s.refreshPeriod)
+        this.select(map(s => s.refreshPeriod))
     )
         .pipe(switchMap(([_, period]) => timer(0, period)));
 
     // We keep this out of the local store as it could change in a high frequency
     countDownOutput$ = this.refreshInterval.pipe(
-        withLatestFrom(this.select((s => s.refreshPeriod))),
+        withLatestFrom(this.select(map(s => s.refreshPeriod))),
         switchMap(([_, period]) => countDown(period, 80, 100)),
         shareReplay(1)
     );
@@ -61,12 +62,12 @@ export class ListViewModel extends LocalState<IListViewModelState> implements IL
 
     constructor() {
         super();
-        this.setSlice(this.initState);
+        this.setState(this.initState);
 
-        this.connectSlice(this.listExpandedChanges
+        this.connectState(this.listExpandedChanges
             .pipe(map(b => ({listExpanded: b})))
         );
-        this.connectSlice(this.selectionChanges
+        this.connectState(this.selectionChanges
             .pipe(
                 map(c => c.source.selectedOptions.selected.map(o => o.value)),
                 map(selectedItems => ({selectedItems}))

@@ -1,4 +1,4 @@
-# Reactive Component State
+# Reactive Local State
 
 @TODOS:
 - 
@@ -19,9 +19,43 @@
 
 <!-- tocstop -->
 
-# Timing
+# What is ephemeral state?
 
-As a lot of problems I ran into while my consulting are related to timing issues, 
+Ephemeral state is just one of many names for data structures 
+that needed to me managed on the client under special conditions.
+Other synonyms are UI state, local state, component state, etc...
+
+It is the data structure that expresses the essential state 
+of a isolated unit like for example a component in your application.
+
+As isolated is a bit vague let me get more concrete.
+
+The data structure does not needed to be shared horizontally i.e. with sibling components.
+
+Think about the following examples:
+- sorting state of a list
+- form errors
+- state of a admin panel (filter, open/close, ...)
+- any dynamic appearing data
+- accumulations from @Input data
+ 
+You rarely share this data with sibling components.
+In other words, there is no need to use state 
+management libraries like ngrx, ngxs, akita etc. there.
+
+Still we need a way to manage this data structures.
+
+
+# Problems to solve
+As a first and foundational decision in the way of data distribution we 
+will pick a push based architecture. This has several advantages but more 
+important defines the problems we will ran into when implementing a solution.
+
+As we defined the way how we want to distribute our data let me list a set of problems we need to solve.
+
+## Timing
+
+As a lot of problems I ran into in applications are related to timing issues, 
 this section is here to give a quick overview of all the different types of issues and their reason.
 
 Shouldn't FRP be by design timing independent?
@@ -141,7 +175,7 @@ export class SubscriptionHandlingComponent {
 
 In this way we get rid of thinking about subscriptions in the component at all.
 
-# The Late Subscriber Problem
+## The Late Subscriber Problem
 
 ![](https://github.com/BioPhoton/blog-component-state/raw/master/images/late-subscriber__michael-hladky.png "Late Subscriber")
 
@@ -208,7 +242,7 @@ And that's not what we want.
 Another downside is the bundle size of ShareReplay. 
 But it will be used anyway somewhere in our architecture, so it's a general downside.
 
-# Sharing references (will not be solved by component-state) 
+## Sharing references (will not be solved by component-state) 
 @TODO Hard rewrite!
 Let me front off explain that this section is specifically here to explain
 why this problem **should not be part of the components state-management**.
@@ -327,7 +361,7 @@ As this kind of problem nearly only to component internal instances it should no
 be bart of the components state-management.
 Also we never store references of class instances in the store as it takes away the whole idea of consistent, controlled state changes.
 
-# The Cold Composition Problem
+## The Cold Composition Problem
 
 Let's quickly clarify hot/cold and uni-case/multi-cast.
 
@@ -540,7 +574,7 @@ source replay the last emitted value.
 
 In the service constructor we called `.connect` to make it hot (subscribe to the source).
 
-# Imperative Interaction with Component StateManagement
+## Imperative Interaction with Component StateManagement
 
 So far we only had focused on independent peaces and didn't payed much attention on their interaction.
 Let's analyze the way we interact with components and services:
@@ -728,7 +762,7 @@ export class AnyComponent {
 
 Note the side-effect is now placed in a `tap` operator and the whole observable is handed over.
 
-# Recap
+## Recap
 
 So far we encountered following topics:
 - _sharing a reference_ (not related to component state)

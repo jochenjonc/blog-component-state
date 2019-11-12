@@ -18,6 +18,7 @@ import {MatCardModule} from "@angular/material";
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../environments/environment';
 import {GithubModule} from "@data-access/github";
+import {MeetingsModule} from "./data-access/meetings/meetings.module";
 
 export const materialModules = [
     BrowserAnimationsModule,
@@ -39,8 +40,7 @@ export const materialModules = [
         RouterModule.forRoot(ROUTES),
         materialModules,
         GithubModule,
-        // ArchitectureModule
-
+        MeetingsModule
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent]

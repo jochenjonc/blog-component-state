@@ -1,0 +1,26 @@
+<h3>Simple List Component</h3>
+<mat-expansion-panel
+        [expanded]="true"
+        *ngIf="meetings$ | async as meetings">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            User Name
+        </mat-panel-title>
+        <mat-panel-description>
+            <span>{{meetings.length}}</span>
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <div *ngIf="meetings.length; else noList">
+        <mat-list>
+            <mat-list-item *ngFor="let item of meetings">
+                {{item.title}} {{item.dueDate | date:'dd.MM.yyy HH:mm:ss'}}
+            </mat-list-item>
+        </mat-list>
+    </div>
+
+    <ng-template #noList>
+        <mat-card>No meetings scheduled!</mat-card>
+    </ng-template>
+
+</mat-expansion-panel>

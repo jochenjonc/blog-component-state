@@ -32,7 +32,7 @@ export class ListMVVMComponent {
     }
 
     @Output()
-    selectionChanges: Observable<string[]> = this.vm.state$
+    selectionChanges: Observable<string[]> = this.vm.select()
         .pipe(map(s => s.selectedItems.map(i => i.id)));
 
     // State from outer sources
@@ -54,8 +54,8 @@ export class ListMVVMComponent {
                 private actions$: Actions) {
 
         // connect ViewModel
-        this.vm.connectSlice(this.refreshPending.pipe(map(refreshPending => ({refreshPending}))));
-        this.vm.connectSlice(this.globalList.pipe(map(list => ({list}))));
+        this.vm.connectState(this.refreshPending.pipe(map(refreshPending => ({refreshPending}))));
+        this.vm.connectState(this.globalList.pipe(map(list => ({list}))));
         // register side-effects
         this.vm.connectEffect(this.refreshTriggerEffect);
     }

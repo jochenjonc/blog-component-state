@@ -14,6 +14,7 @@ export class SimpleListModel extends LocalState<ISimpleListModel> {
         listExpanded: false,
         list: []
     };
+    state$ = this.select();
 
     refreshRequest = new Subject();
 
@@ -25,10 +26,10 @@ export class SimpleListModel extends LocalState<ISimpleListModel> {
 
     constructor(private store: Store<any>) {
         super();
-        this.setSlice(this.initState);
+        this.setState(this.initState);
 
         // State from other sources
-        this.connectSlice(this.store.select(selectGitHubList)
+        this.connectState(this.store.select(selectGitHubList)
             .pipe(map(this.parseListItems), map(list => ({list})))
         );
         this.connectEffect(this.refreshEffect);

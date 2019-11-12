@@ -24,8 +24,10 @@ import {ListView} from "./list.view";
 export class ListMVCComponent {
 
 
+    state$ = this.m.select();
+
     @Output()
-    selectionChanges: Observable<string[]> = this.m.state$
+    selectionChanges: Observable<string[]> = this.m.select()
         .pipe(map(s => s.selectedItems.map(i => i.id)));
 
     // Component-Level Side-Effects
@@ -33,9 +35,9 @@ export class ListMVCComponent {
                 public v: ListView,
                 private store: Store<GitHubFeatureState>) {
         // Connect Model
-        this.m.connectSlice(this.v.listExpandedChanges
+        this.m.connectState(this.v.listExpandedChanges
             .pipe(map(listExpanded => ({listExpanded}))));
-        this.m.connectSlice(this.v.selectionChanges
+        this.m.connectState(this.v.selectionChanges
             .pipe(
                 map(c => c.source.selectedOptions.selected.map(o => o.value)),
                 map(selectedItems => ({selectedItems}))

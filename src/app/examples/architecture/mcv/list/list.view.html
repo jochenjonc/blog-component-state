@@ -1,7 +1,7 @@
 <!-- NOTE: in the view the only variable we want to touch is `vm`-->
 <h3>List Component</h3>
 <mat-expansion-panel
-        *ngIf="m.state$ | async as s"
+        *ngIf="state$ | async as s"
         (expandedChange)="v.listExpandedChanges.next($event)"
         [expanded]="s.listExpanded">
 

@@ -1,0 +1,14 @@
+.notification-overlay {
+  position: absolute;
+  right: 0px;
+  width: 215px;
+  padding-right: 15px;
+  .notification {
+    .close {
+
+    }
+    &.info {
+      background-color: $mat-light-blue;
+    }
+  }
+}

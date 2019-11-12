@@ -13,16 +13,18 @@ export class SimpleListViewModel extends LocalState<ISimpleListVMState> implemen
         list: []
     };
 
+    state$ = this.select();
+
     // IListView =================================================
     refreshClicks  = new Subject<Event>();
     listExpandedChanges  = new Subject<boolean>();
 
     constructor() {
         super();
-        this.connectSlice(this.listExpandedChanges
+        this.connectState(this.listExpandedChanges
             .pipe(map(b => ({listExpanded: b})))
         );
-        this.setSlice(this.initState);
+        this.setState(this.initState);
     }
 
 }

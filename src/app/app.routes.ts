@@ -8,6 +8,7 @@ import {ROUTES as DECLARATIVE_INTERACTION_ROUTES} from "./examples/declarative-i
 import {ROUTES as LOW_LEVEL_STATE_ROUTES} from "./examples/low-level-component-state/low-level-component-state.module";
 import {ROUTES as STATE_INIT_CLEANUP_ROUTES} from "./examples/state-init-and-cleanup/state-init-and-cleanup.module";
 import {ROUTES as ARCHITECTURE_ROUTES} from "./examples/architecture/architecture.module";
+import {ROUTES as NOTIFICATION_ROUTES} from "./examples/notification/notification.module";
 
 export const ROUTES = [
     {
@@ -24,5 +25,6 @@ export const ROUTES = [
     {path: 'low-level-component-state', children: LOW_LEVEL_STATE_ROUTES},
     {path: 'state-init-cleanup', children: STATE_INIT_CLEANUP_ROUTES},
     {path: 'process-override-slice', children: PROCESS_OVERRIDE_SLICE_ROUTES},
-    {path: 'architecture', children: ARCHITECTURE_ROUTES}
+    {path: 'architecture', children: ARCHITECTURE_ROUTES},
+    {path: 'notification', children: NOTIFICATION_ROUTES}
 ];

@@ -24,7 +24,7 @@ export class SimpleListMVVMComponent {
     constructor(public vm: SimpleListViewModel,
                 private store: Store<any>) {
         // Component Model - composed out of one or multiple sources
-        this.vm.connectSlice(this.globalList
+        this.vm.connectState(this.globalList
             .pipe(map(list => ({list})))
         );
 

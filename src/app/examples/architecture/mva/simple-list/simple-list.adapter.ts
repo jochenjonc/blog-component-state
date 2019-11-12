@@ -26,8 +26,8 @@ export class SimpleListAdapter extends LocalState<{
 
     constructor(private store: Store<any>) {
         super();
-        this.setSlice(this.initState);
-        this.connectSlice(this.globalList
+        this.setState(this.initState);
+        this.connectState(this.globalList
             .pipe(map(list => ({list})))
         );
         this.connectEffect(this.refreshEffect);
