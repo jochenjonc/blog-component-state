@@ -103,5 +103,8 @@
       }
     }
   },
-  "defaultProject": "blog-component-state"
+  "defaultProject": "blog-component-state",
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
+  }
 }

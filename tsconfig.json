@@ -22,8 +22,14 @@
       "@data-access/github": [
         "src/app/data-access/github"
       ],
+      "@data-access/github/*": [
+        "src/app/data-access/github/"
+      ],
       "@data-access/meetings": [
         "src/app/data-access/meetings"
+      ],
+      "@data-access/meetings/*": [
+        "src/app/data-access/meetings/*"
       ],
       "@common": [
         "src/app/common"

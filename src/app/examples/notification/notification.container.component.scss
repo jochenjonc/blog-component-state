@@ -1,14 +1,28 @@
+
 .notification-overlay {
   position: absolute;
+  z-index: 10;
+  top: 64px;
   right: 0px;
   width: 215px;
   padding-right: 15px;
+  padding-top: 15px;
   .notification {
+    margin-bottom: 15px;
     .close {
 
     }
     &.info {
-      background-color: $mat-light-blue;
+      background-color: cornflowerblue !important;
+      color: black;
+    }
+    &.success {
+      background-color: lightseagreen !important;
+      color: white;
+    }
+    &.error {
+      background-color: palevioletred !important;
+      color: white;
     }
   }
 }

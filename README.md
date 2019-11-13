@@ -2,54 +2,154 @@
 
 @TODOS:
 - 
-- grammarly
+- Grammarly
 
 <!-- toc -->
 
-- [Timing](#timing)
+- [Layers of state](#layers-of-state)
+- [What is the ephemeral state?](#what-is-the-ephemeral-state)
+  * [Global vs Local Accessibility of Data Structures](#global-vs-local-accessibility-of-data-structures)
+  * [Static vs Dynamic Lifetime of Data Structures](#static-vs-dynamic-lifetime-of-data-structures)
+  * [Global vs Local Processed Sources](#global-vs-local-processed-sources)
+  * [Recap](#recap)
+- [Problems to solve](#problems-to-solve)
+  * [Timing](#timing)
 - [Subscription Handling](#subscription-handling)
-- [The Late Subscriber Problem](#the-late-subscriber-problem)
-- [Sharing references (will not be solved by component-state)](#sharing-references-will-not-be-solved-by-component-state)
-- [The Cold Composition Problem](#the-cold-composition-problem)
-- [Imperative Interaction with Component StateManagement](#imperative-interaction-with-component-statemanagement)
-- [Recap](#recap)
+  * [The Late Subscriber Problem](#the-late-subscriber-problem)
+  * [Sharing references (will not be solved by component-state)](#sharing-references-will-not-be-solved-by-component-state)
+  * [The Cold Composition Problem](#the-cold-composition-problem)
+  * [Imperative Interaction with Component StateManagement](#imperative-interaction-with-component-statemanagement)
+  * [Recap](#recap-1)
 - [Dynamic Component State and Reactive Context](#dynamic-component-state-and-reactive-context)
   * [Initialisation and Cleanup](#initialisation-and-cleanup)
   * [Overriding State Changes and Effects](#overriding-state-changes-and-effects)
+- [Glossar](#glossar)
 
 <!-- tocstop -->
 
-# What is ephemeral state?
+# Layers of state
 
-Ephemeral state is just one of many names for data structures 
-that needed to me managed on the client under special conditions.
+
+In this article I will introduce 3 layers of state:
+- Persistent Server State
+- Persistent Client State (Global State)
+- Ephemeral Client State (Local State)
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_layers-of-state__michael-hladky.png "Layers of State")
+
+**Persistent Server State** is the data in your database. It is provided to the consumer over a data API like REST, GraphQL, Websocket, etc.
+For persistent and ephemeral client states I will try to use to more simpler wording **Global State** and **Local State**, where ephemeral state maps to the local state.
+Both live on the client but they desire different treatments.
+
+# What is the ephemeral state?
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_ephemeral-state__michael-hladky.png "What is Ephemeral State")
+
+The ephemeral state is just one of many names for data structures 
+that needed to be managed on the client under special conditions.
 Other synonyms are UI state, local state, component state, etc...
 
 It is the data structure that expresses the essential state 
-of a isolated unit like for example a component in your application.
+of an isolated unit like for example a component in your application.
 
-As isolated is a bit vague let me get more concrete.
+As isolated is a bit vague let me get a little bit more concrete.
 
-The data structure does not needed to be shared horizontally i.e. with sibling components.
+## Global vs Local Accessibility of Data Structures
 
-Think about the following examples:
+The global state is well known in modern web development. 
+It is the state we share globally in our app i.e. a `@ngRx/store` or the good old `window` object ;)
+
+This is not called an ephemeral state, but the persistent state.
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_global-accessible-state__michael-hladky.png "Global Accessible State")
+
+As we can see one global source distributes state to the whole app.
+ 
+If we compare this to a local state we see that this data structure is provided and managed only in a certain scope of your app.
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_local-accessible-state__michael-hladky.png "Local Accessible State")
+
+This is our first rue of thumb to detect local state: 
+
+> No horizontal sharing of the state i.e. with sibling components.
+
+## Static vs Dynamic Lifetime of Data Structures
+
+In Angular global state is nearly always shared over global singleton services.
+Their lifetime starts even before the root component. And ends after every child component.
+Its lifetime is ~equal to the Apps lifetime or the browser windows lifetime.
+
+This is static called a static lifetime.
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-global-singleton-service__michael-hladky.png "Lifetime Global Singleton Service")
+
+
+If we compare this to the lifetime of other building blocks of angular we can see their life time is way more dynamic.
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-global-singleton-service__michael-hladky.png "Lifetime Global Singleton Service")
+
+The best example of a dynamic lifetime is data that gets rendered over the `async` pipe.
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-angular-building-blocks__michael-hladky.png "Lifetime Angular Building Blocks")
+
+The lifetime depends on the evaluation of the template expression, a potential `*ngIf` that wraps the expression or many other things.
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-async-pipe__michael-hladky.png "Lifetime async Pipe")
+
+Our second rule of thumb we detected for the local state is: 
+
+> The lifetime is dynamic i.e. bound to an async pipe
+
+## Global vs Local Processed Sources
+
+Where our global state service nearly always processes remote sources:
+- REST API's
+- Web Sockets
+- Browser URL
+- Browser Plugins
+- Global Static Data
+
+And te logic is located in the upper layer of our architecture. 
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_processing-global-sources__michael-hladky.png "Processing of Global Sources")
+
+
+A local state service would nearly always focus on the process the following: 
+- Data from @InputBindings
+- UI Events
+- Component level Side-Effects
+- Parsing global state to local
+
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_processing-local-sources__michael-hladky.png "Processing of Local Sources")
+
+
+A a third rule of thumb we say: 
+
+> It processes local relevant events i.e. sort/filter change
+
+
+---
+
+## Recap
+
+> **We defined 3 rules of thumb to detect ephemeral/local state**
+> - No horizontal sharing of state
+> - The lifetime of the state is dynamic
+> - It processes local relevant events
+
+Some real-life example that matches the above-defined rules are:
 - sorting state of a list
 - form errors
-- state of a admin panel (filter, open/close, ...)
+- state of an admin panel (filter, open/close, ...)
 - any dynamic appearing data
 - accumulations from @Input data
  
-You rarely share this data with sibling components.
-In other words, there is no need to use state 
-management libraries like ngrx, ngxs, akita etc. there.
+You rarely share this data with sibling components, it only shares data-structures only locally and focuses mostly on local sources.
+In other words, there is no need to use state management libraries like ngrx, ngxs, Akita, etc. there.
 
-Still we need a way to manage this data structures.
+Still, we need a way to manage these data structures.
 
 
 # Problems to solve
-As a first and foundational decision in the way of data distribution we 
-will pick a push based architecture. This has several advantages but more 
-important defines the problems we will ran into when implementing a solution.
+As a first and foundational decision in the way of data distribution, we will pick a push-based architecture. This has several advantages but more important defines the problems we will run into when implementing a solution.
 
 As we defined the way how we want to distribute our data let me list a set of problems we need to solve.
 
@@ -60,30 +160,29 @@ this section is here to give a quick overview of all the different types of issu
 
 Shouldn't FRP be by design timing independent?
 
-I mean not that there is no time in observables, but when we compose observables we 
-should not care about when any of our state sources exactly emits a value... 
+I mean not that there is no time in observables, but when we compose observables we should not care about when any of our state sources exactly emit a value... 
 
-In fact that's the case, in a perfect reactive setup we don't need to care about those problems.
-However, as Angular is an object orientated framework we have to often with different problems related to life-cycles of components and services, router-events and many more things.
+That's the case, in a perfect reactive setup, we don't need to care about those problems.
+However, as Angular is an object-orientated framework we have to often with different problems related to life-cycles of components and services, router-events and many more things.
 
-In RxJS timing is give by the following:
+In RxJS timing is given by the following:
 - For hot observables the **time of creation**
 - For cold observables the **time of subscription**
 - For emitted values the **scheduling process**
 
 In Angular timing is given by the following:
-- For global services the **creation** as well as the application **life-time**
-- For components the **creation**, several **life-cycle hooks** as well as the component **life-time**
-- For local services the **creation** of the component as well as the components **life-time**
-- For pipes oe directives in the template also the components **life-time**
+- For global services the **creation** as well as the application **lifetime**
+- For components the **creation**, several **life-cycle hooks** as well as the component **lifetime**
+- For local services the **creation** of the component as well as the components **lifetime**
+- For pipes or directives in the template also the components **lifetime**
 
-All timing relates things in Angular are in object oriented style, very similar to hot observables.
-Subscription handling can be done declarative over completion operators. 
-The scheduling process can be controlled both over imperative or over operators and can influence the execution context of next error or complete callback.
+All timing relates things in Angular are in object-oriented style, very similar to hot observables.
+Subscription handling can be done declaratively over completion operators. 
+The scheduling process can be controlled both over imperative or over operators and can influence the execution context of the next error or complete callback.
 
 We see that there are two different concepts combined that have completely different ways of dealing with timing. 
 Angular already solved parts of this friction points but some of 
-them are still left and we have to find the right spots to put our glue code and fix the problem.
+they are still left and we have to find the right spots to put our glue code and fix the problem.
 
 ![](https://github.com/BioPhoton/blog-component-state/raw/master/images/angular-timeline__michael-hladky.png "Angular Timeline")
 
@@ -102,8 +201,8 @@ Let's discuss where subscriptions should take place and for which reason they ar
 
 Subscriptions are here to receive values from any source.
 
-In most cases we want to render the incoming values.
-For this reason we use a `Pipe` or a `Directive` in the template to trigger
+In most cases, we want to render the incoming values.
+For this reason, we use a `Pipe` or a `Directive` in the template to trigger
 change-detection whenever a value arrives.
 
 The other reason could be to run some background tasks in a `Component`, `Directive` or `Service`,
@@ -173,7 +272,7 @@ export class SubscriptionHandlingComponent {
 }
 ```
 
-In this way we get rid of thinking about subscriptions in the component at all.
+In this way, we get rid of thinking about subscriptions in the component at all.
 
 ## The Late Subscriber Problem
 
@@ -181,7 +280,7 @@ In this way we get rid of thinking about subscriptions in the component at all.
 
 Incoming values arrive before the subscription has happened.
 
-For example state over `@Input()` decorators arrives before the view gets rendered and a used pipe could receive the value.
+For example state over `@Input()` decorators arrive before the view gets rendered and a used pipe could receive the value.
 
 ```typescript
 @Component({
@@ -201,7 +300,7 @@ export class LateSubscriberComponent {
 }
 ```
 
-We call this situation late subscriber problem. In this case, the view is a late subscribe to the values from '@Input()' properties.
+We call this situation a late subscriber problem. In this case, the view is a late subscribe to the values from '@Input()' properties.
 There are several situations from our previous explorations that have this problem:
 - [Input Decorators](Input-Decorators)
   - transporting values from `@Input` to `AfterViewInit` hook
@@ -248,7 +347,7 @@ Let me front off explain that this section is specifically here to explain
 why this problem **should not be part of the components state-management**.
 
 To start this section let's discuss the components implementation details first.
-We focus in the components outputs. 
+We focus on the component's outputs. 
 
 ```typescript
 @Component({
@@ -279,13 +378,13 @@ An observable for example holds a subscribe method in it
 
 With this in mind let's focus on the original problem, sharing a reference.
 
-In this example we receive a config object from the parent component and emit changes from the formGroup created out of the config object.
+In this example, we receive a config object from the parent component and emit changes from the form group created out of the config object.
 
 Every time we receive a new value from the input binding 
 - we create a config object out of it
 - and use the `FormBuilder` service to create the new form.
-As output value we have to provide something that holds a `subscribe` method.
-So we could use the formGroups `valueChanges` to provide the forms changes directly as component output events.
+As output value, we have to provide something that holds a `subscribe` method.
+So we could use the form groups `value changes` to provide the forms changes directly as component output events.
 
 ```typescript
 @Component({
@@ -331,7 +430,7 @@ export class SharingAReferenceComponent {
 
 But the values are not updating in the parent component.
 We forgot that our `formGroup$` observable ends with a `map` operator,
-which returns is a uni-cast observable.
+which returns are a uni-cast observable.
 
 What happened is we subscribed once in the template over the `async` pipe to render the form.
 And another time in the component internals to emit value changes from the form.
@@ -357,49 +456,49 @@ Important to notice here is that `shareReplay` is cold but multicast.
 This means it only subscribes to the source if at least one subscriber is present.
 This does not solve the problem of cold composition.
 
-As this kind of problem nearly only to component internal instances it should not
-be bart of the components state-management.
-Also we never store references of class instances in the store as it takes away the whole idea of consistent, controlled state changes.
+As this kind of problem nearly only to component internal instances, it should not
+be part of the components state-management.
+Also, we never store references of class instances in the store as it takes away the whole idea of consistent, controlled state changes.
 
 ## The Cold Composition Problem
 
 Let's quickly clarify hot/cold and uni-case/multi-cast.
 
 **cold** 
-Means the producer sits inside of the observable.
+This means the producer sits inside of the observable.
 Whenever .subscribe is called the subscriber function fires and we create a new instance fo the producer.
 i.e. the static `interval` gets created whenever we subscribe to it.
 
 **hot**
-Means the producer sits outside of the observable.
+This means the producer sits outside of the observable.
 The producer emits values independent of the subscriber. If .subscribe is called we will receive all values from the moment of subscription on. 
 The past values are not recognized.
 i.e. the `@Input` binding is a hot producer
 that sits outside of our `Subject` (extends `Observable`) and emits values independent of the moment when `async` pipe subscribes.
 
 **uni-cast**
-Means the producer is unique per subscription.
-i.e. `fromEvent` is a uni-cast observable as we pass a
+This means the producer is unique per subscription.
+i.e. `from event` is a uni-cast observable as we pass a
 new function per subscription for the internal `.addEventListener` call.
 And if we unsubscribe we remove only this function, and not the others.
 
 **multi-cast**
-Means there is one producer instance fol all subscription.
-i.e. A subject that emits the values from a single producer to all subscriber.
+This means there is one producer instance fol all subscription.
+i.e. A subject that emits the values from a single producer to all subscribers.
 
-With this in mind we can discuss the problem of cold composition in case of our component state.
+With this in mind, we can discuss the problem of cold composition in case of our component state.
 
 --- 
 
 As we will have to deal with:
 - View Interaction ( button click )
-- Global State Changes ( http update )
+- Global State Changes ( HTTP update )
 - Component State Changes ( triggered by button or interval )
 
 Putting all this logic in the component class is a bad idea. 
-Not only because of separations of concerns, but also because we would have to implemet it over and over again.
+Not only because of separations of concerns but also because we would have to implement it over and over again.
 
-We need to make the logic that deal with problems around composition
+We need to make the logic that deals with problems around the composition
 reusable!
 
 So far our sources got subscribed to when the view was ready and we rendered the state.
@@ -411,7 +510,7 @@ We have hot sources and we have to compose them.
 As a minimal requirement to create state we should have at least the last emission of each source to compute a state.
 
 If we compose state we have to consider that every operator returns cold observables.
-(Operators that return `ConnectableObservable` are not really operators as they are not compos-able)
+(Operators that return `ConnectableObservable` are not operators as they are not compos-able)
 
 So no matter what we do before, after an operation we get a cold observable, and we have to subscribe to it to trigger the composition.
 I call this situation cold composition, as with selector functions in i.e. publish we are also able to create hot compositions.
@@ -422,21 +521,21 @@ Some of our sources are This can be solved by tow ways:
 
 Let's discuss a) first.
 
-If we would make every source replay at least the last value we would have to implement this logic in following places:
+If we would make every source replay at least the last value we would have to implement this logic in the following places:
 - View Input bindings (multiple times)
 - View events (multiple times)
 - Other Service Changes (multiple times)
 - Component Internal interval (multiple times)
 
 It would also force the parts to cache values and increase memory.
-Furthermore it would force third party to implement tis too. 
+Furthermore, it would force the third party to implement this too. 
 
-IMHO not really scalable.
+IMHO not scalable.
 
 What would be the scenario with b)?
 
 We could think of the earliest possible moment to make the composition hot. 
-From the diagram above we know that a service, even if locally provided, 
+From the diagram above we know that service, even if locally provided, 
 is instantiated first, before the component.
 
 If we would put it there we could take over the workload from:
@@ -448,12 +547,12 @@ All involved services can not be covered.
 
 But what services are we interested in?
 
-Stateful services, and stateful services will, by definition, always provide there last emitted state.
+Stateful services and stateful services will, by definition, always provide there last emitted state.
 So if we compose other sources form services like `@ngRx/store` etc. we can assume they replay their last emitted state and we can run the composition.
 
-In worse case we could fix it by concating with an initial value. 
+In worse case, we could fix it by contacting with an initial value. 
 
-Let's see an simple example where we compose different sources in a service and and one of our sources is not replaying the last value:
+Let's see a simple example where we compose different sources in service and one of our sources is not replaying the last value:
 
 **Service:**
 ```typescript
@@ -519,13 +618,13 @@ export class ColdCompositionBadComponent implements OnDestroy {
 
 If we run the code we would start rendering with {sum: 1}.
 
-The service is the first thing that gets initialised.
+The service is the first thing that gets initialized.
 The initial commands are fired, but the initial values are fired before the component gets instantiated
 and subscribes to the service. 
 
 Even if the source is hot (the subject in the service is defined on instantiation) the composition made the stream cold again.
-Which means the composed values can be received only if there is at least 1 subscriber. 
-In our case the subscriber was the component constructor. 
+This means the composed values can be received only if there is at least 1 subscriber. 
+In our case, the subscriber was the component constructor. 
 
 Let's see how we can implement the above discussed solution with hot composition:
 
@@ -572,16 +671,16 @@ We kept the component untouched and only applied changes to the service.
 We used the `publishReplay` operator to make the
 source replay the last emitted value.
 
-In the service constructor we called `.connect` to make it hot (subscribe to the source).
+In the service constructor, we called `.connect` to make it hot (subscribe to the source).
 
 ## Imperative Interaction with Component StateManagement
 
-So far we only had focused on independent peaces and didn't payed much attention on their interaction.
+So far we only had focused on independent peace and didn't paid much attention to their interaction.
 Let's analyze the way we interact with components and services:
 
-Well known implementations of sate management like `@ngrx/store`,
-which is a global state management library, implemented the consumer facing API in an imperative way.
-The provided method is `dispatch` which accepts a single value that get sent to the store. 
+Well, known implementations of sate management like `@ngrx/store`,
+which is a global state management library, implemented the consumer-facing API imperatively.
+The provided method is `dispatch` which accepts a single value that gets sent to the store. 
 
 Let's look at a simple example:
 
@@ -764,7 +863,7 @@ Note the side-effect is now placed in a `tap` operator and the whole observable 
 
 ## Recap
 
-So far we encountered following topics:
+So far we encountered the following topics:
 - _sharing a reference_ (not related to component state)
 - subscription handling
 - late subscriber
@@ -772,8 +871,8 @@ So far we encountered following topics:
 - moving primitive tasks as subscription handling and state composition into another layer
 - declarative interaction between component and service
 
-If we would pipe every incoming value to a "thing" and implement the a combination of the above problems
-i a single place.
+If we would pipe every incoming value to a "thing" and implement the combination of the above problems
+I a single place.
 
 Let's see how the solutions look like when we put them into i.e. a service.
 
@@ -858,7 +957,7 @@ export class AnyComponent {
 ```
 
 # Dynamic Component State and Reactive Context
-With a more declarative interaction between component and service we made a big change.
+With a more declarative interaction between component and service, we made a big change.
 We are now aware of the whole observable context. 
 
 The `next`, `error` and `compolete` notifications.
@@ -868,10 +967,10 @@ This can help us to rethink a lot of problems that did not occur with global sta
 ## Initialisation and Cleanup
 
 Initializing the state worked well in global state management by providing a default value in the reducer function. 
-Also with input bindings we could set a default value. But there are situations where we need to initialize a not yet emitted state.
-In addition to that with a highly dynamic state like we have with the components state we also have to think about cleanup unused state.
+Also with input bindings, we could set a default value. But there are situations where we need to initialize a not yet emitted state.
+In addition to that with a highly dynamic state like we have with the components state, we also have to think about the clean up unused state.
 
-With the declarative approach we have now the ability to react on the completion of an observable.
+With the declarative approach, we have now the ability to react on the completion of an observable.
 
 The current accumulation function for the components state looks like this:
 
@@ -898,7 +997,7 @@ const stateAccumulator = (state, [keyToDelete, value]: [string, number]): { [key
 };
 ```
 
-Now lets thing about the following example:
+Now lets think about the following example:
 
 ```typescript
 @Component({
@@ -941,8 +1040,8 @@ As the keys where dynamic there is not really a good way of detection which key 
 Let's see what we can do with the above example.
 As we know we adopted the accumulation function to remove keys with undefined from the state object.
 
-By emitting `undefined` after emission of the last value we can cleanup this state.
-We can also initialize it with zero even if the first value is sent later in time.
+By emitting `undefined` after emission of the last value, we can clean up this state.
+We can also initialize it with zero even if the first value is sent later.
 
 Lets add one line to our state slice observable:
 
@@ -964,13 +1063,13 @@ The solution for dynamic Observables from the view belongs not to this document.
 
 ## Overriding State Changes and Effects
 
-As we are noe able to provide observables that contain our state changes a new question needs to get asked.
+As we are now able to provide observables that contain our state changes a new question needs to get asked.
 
-What happens if we provide provide multiple observables for the same state slice?
+What happens if we provide multiple observables for the same state slice?
 
 Two possible things can happen:
 - Both observable get merged and all emissions change the same state slice concurrent
-- The new observable for a same state slice overrides the changes from the previous observable for this state slice
+- The new observable for the same state slice overrides the changes from the previous observable for this state slice
 
 Let's discuss scenarios for both.
 
@@ -978,3 +1077,9 @@ Let's discuss scenarios for both.
 
 
 **Override State Changes**
+
+
+# Glossar
+
+- Global State 
+- Local State

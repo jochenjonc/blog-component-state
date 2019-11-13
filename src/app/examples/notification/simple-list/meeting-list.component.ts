@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, ViewEncapsulation} from '@angular/core';
 import {ReplaySubject} from "rxjs";
-import {MeetingListItem} from "@data-access/meetings";
+import {Meeting} from "@data-access/meetings";
 
 @Component({
     selector: 'meeting-list',
@@ -9,9 +9,9 @@ import {MeetingListItem} from "@data-access/meetings";
     encapsulation: ViewEncapsulation.None
 })
 export class MeetingList {
-    meetings$ = new ReplaySubject<MeetingListItem[]>();
+    meetings$ = new ReplaySubject<Meeting[]>();
     @Input()
-    set meetings(meetings: MeetingListItem[]) {
+    set meetings(meetings: Meeting[]) {
         if(meetings) {
             this.meetings$.next(meetings);
         }

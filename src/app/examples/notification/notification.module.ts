@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatCardModule, MatExpansionModule, MatListModule} from "@angular/material";
+import {MatButtonModule, MatCardModule, MatExpansionModule, MatListModule} from "@angular/material";
 import {NotificationContainerComponent} from "./notification.container.component";
 import {MeetingList} from "./simple-list/meeting-list.component";
 
@@ -17,7 +17,8 @@ const DECLARATIONS = [
 export const materialModules = [
     MatCardModule,
     MatExpansionModule,
-    MatListModule
+    MatListModule,
+    MatButtonModule
 ];
 
 @NgModule({
