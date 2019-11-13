@@ -12,14 +12,15 @@ export class NotificationContainerAdapter implements NotificationsContainerView 
     notifications$ = this.m.select(map(s => Object.entries(s.notifications.entities)
         .map(([key, notification]): MeetingNotification => notification)));
     meetings$ = this.m.select(map(s => s.meetings));
-
+    fetchPending$ =this.m.select(map(s => s.fetchPending));
     scheduleRandomMeetingEvent = new Subject<Event>();
     refreshMeetingEvent = new Subject<Event>();
 
     constructor(private m: NotificationContainerModel) {
         this.scheduleRandomMeetingEvent
             .subscribe(this.m.scheduleRandomMeeting);
-
+        this.refreshMeetingEvent
+            .subscribe(_ => this.m.fetchMeetings())
     }
 
 }

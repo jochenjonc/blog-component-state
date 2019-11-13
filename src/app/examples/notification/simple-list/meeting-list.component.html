@@ -1,8 +1,10 @@
 <h3>Simple List Component</h3>
 <mat-expansion-panel
+        class="meeting-list"
         [expanded]="true"
         *ngIf="meetings$ | async as meetings">
     <mat-expansion-panel-header>
+        <mat-progress-bar *ngIf="fetchPending$ | async" [mode]="'query'" ></mat-progress-bar>
         <mat-panel-title>
             User Name
         </mat-panel-title>
@@ -14,7 +16,7 @@
     <div *ngIf="meetings.length; else noList">
         <mat-list>
             <mat-list-item *ngFor="let item of meetings">
-                {{item.title}} {{item.dueDate | date:'dd.MM.yyy HH:mm:ss'}}
+                {{item.title}} {{item.dueDateTimeStamp | date:'dd.MM.yyy HH:mm:ss'}}
             </mat-list-item>
         </mat-list>
     </div>

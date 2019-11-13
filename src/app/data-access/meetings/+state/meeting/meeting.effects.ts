@@ -1,17 +1,18 @@
 import {Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
-import {concat, of} from 'rxjs';
-import {catchError, map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {catchError, mergeMap, switchMap, tap} from 'rxjs/operators';
 
 import {MeetingsService} from '../../meetings.service';
 import {
+    addMeetings,
     fetchMeetingList,
     meetingListFetchError,
     meetingListFetchSuccess,
     meetingPostError,
     meetingPostSuccess,
-    postMeeting,
-    addMeetings} from "./meeting.actions";
+    postMeeting
+} from "./meeting.actions";
 
 @Injectable({
     providedIn: 'root'
@@ -47,8 +48,8 @@ export class MeetingEffects {
                         }
                     }),
                     mergeMap(meetings => [
-                            meetingPostSuccess({meeting: meetings.pop()}),
-                       //     addMeetings({meetings})
+                            meetingPostSuccess({meeting: meetings[0]}),
+                            addMeetings({meetings})
                         ]),
                     catchError(error => of(meetingPostError({error, meeting: action.meeting})))
                 )

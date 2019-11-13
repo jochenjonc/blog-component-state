@@ -1,5 +1,5 @@
 export interface Meeting {
   id: string;
-  dueDate: number;
+  dueDateTimeStamp: number;
   title: string;
 }

@@ -9,12 +9,20 @@ import {Meeting} from "@data-access/meetings";
     encapsulation: ViewEncapsulation.None
 })
 export class MeetingList {
-    meetings$ = new ReplaySubject<Meeting[]>();
+    meetings$ = new ReplaySubject<Meeting[]>(1);
+
     @Input()
     set meetings(meetings: Meeting[]) {
-        if(meetings) {
+        if (meetings) {
             this.meetings$.next(meetings);
         }
+    }
+
+    fetchPending$ = new ReplaySubject<boolean>(1);
+
+    @Input()
+    set fetchPending(fetchPending: boolean) {
+        this.fetchPending$.next(fetchPending);
     }
 
     constructor() {

@@ -5,6 +5,7 @@ import {MeetingNotification} from "./interfaces";
 export interface NotificationsContainerView {
     meetings$: Observable<Meeting[]>;
     notifications$: Observable<MeetingNotification[]>;
+    fetchPending$: Observable<boolean>;
     scheduleRandomMeetingEvent: Subject<Event>;
     refreshMeetingEvent: Subject<Event>;
 }

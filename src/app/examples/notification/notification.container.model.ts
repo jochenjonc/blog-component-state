@@ -1,17 +1,20 @@
 import {Injectable} from "@angular/core";
 import {createUnsortedStateAdapter, LocalState} from "@common";
-import {concat, EMPTY, Observable, Subject} from "rxjs";
+import {concat, EMPTY, merge, Observable, pipe, Subject} from "rxjs";
 import {concatMap, delay, map, mergeMap, take, tap} from "rxjs/operators";
 import {Store} from "@ngrx/store";
 import {Actions, ofType} from "@ngrx/effects";
 import {EntityState} from "@ngrx/entity";
 import * as fromMeeting from "../../data-access/meetings";
 import {MeetingNotification} from "./interfaces";
-import {fetchMeetingList} from "../../data-access/meetings";
+import {fetchMeetingList, Meeting, meetingListFetchError, meetingListFetchSuccess} from "../../data-access/meetings";
+import {fetchRepositoryList, repositoryListFetchError, repositoryListFetchSuccess} from "@data-access/github";
 
 interface INotificationContainerModel {
     notifications: EntityState<MeetingNotification>;
-    meetings:  fromMeeting.Meeting[]
+    meetings:  fromMeeting.Meeting[];
+    fetchPending: boolean;
+
 }
 
 @Injectable()
@@ -21,7 +24,8 @@ export class NotificationContainerModel extends LocalState<INotificationContaine
             ids: [],
             entities: {}
         },
-        meetings:[]
+        meetings:[],
+        fetchPending: false
     };
 
     //
@@ -31,15 +35,17 @@ export class NotificationContainerModel extends LocalState<INotificationContaine
     private meetingPostError$ = this.actions$.pipe(
         ofType(fromMeeting.meetingPostError)
     );
-    scheduleRandomMeeting = new Subject<any>();
 
     notifications$ = this.select(map(s => s.notifications));
+
     private notificationsAdapter = createNotificationAdapter(this.notifications$);
+
+
+    scheduleRandomMeeting = new Subject<any>();
 
     constructor(private store: Store<fromMeeting.MeetingFeatureState>,
                 private actions$: Actions) {
         super();
-        this.fetchMeetings();
 
         this.select().subscribe(console.log);
         this.store.select(fromMeeting.selectMeetingFeature);
@@ -48,8 +54,20 @@ export class NotificationContainerModel extends LocalState<INotificationContaine
 
         this.setState(this.initState);
 
+        this.connectState(this.actions$.pipe(
+                ofType(fetchMeetingList, meetingListFetchSuccess, meetingListFetchError),
+                map(a => ({fetchPending: a.type === fetchMeetingList.type}))
+            ));
+
         this.connectState(this.store.select(fromMeeting.selectAllMeetings)
             .pipe(map(meetings => ({meetings}))));
+
+        this.connectEffect(
+            this.scheduleRandomMeeting.pipe(
+                map(() => this.getMeeting()),
+                tap(meeting => this.store.dispatch(fromMeeting.postMeeting({meeting})))
+            )
+        );
 
         this.connectState(
             this.meetingPostSuccess$
@@ -79,41 +97,85 @@ export class NotificationContainerModel extends LocalState<INotificationContaine
                 )
         );
 
-        this.connectEffect(
-            this.scheduleRandomMeeting.pipe(
-                map(() => this.getMeeting()),
-                tap(meeting => this.store.dispatch(fromMeeting.postMeeting({meeting})))
-            )
-        );
+        // Meeting Reminders
+        this.connectState(
+            this.meetingPostSuccess$
+                .pipe(
+                    mergeMap(meeting => {
+                        const fadeOutDelay = EMPTY.pipe(delay(5500));
+                        const updatePeriod = EMPTY.pipe(delay(5000));
+                        const timeOfFirstNotification = new Date(meeting.dueDateTimeStamp  * 1000);
+                        timeOfFirstNotification.setSeconds(timeOfFirstNotification.getSeconds()-15);
 
+                        const remindUser = [
+                            // Show - Meeting in 5 Sec
+                            this.notificationsAdapter.upsertNotification(this.getReminderNotification(meeting)),
+                            // Hide - Message after n Sec
+                            fadeOutDelay,
+                            this.notificationsAdapter.removeNotification(this.getReminderNotification(meeting)),
+                        ];
+
+                        return concat(
+                            EMPTY.pipe(delay(timeOfFirstNotification)),
+                            // Show - Meeting in 15 Sec
+                            ...remindUser,
+                            updatePeriod,
+
+                            // Show - Meeting in 10 Sec
+                            ...remindUser,
+                            updatePeriod,
+
+                            // Show - Meeting in 5 Sec
+                            ...remindUser,
+                            updatePeriod,
+
+                            // Show - Meeting Now
+                            this.notificationsAdapter.upsertNotification(this.getAlertNotification(meeting)),
+                            fadeOutDelay,
+                            // Show - Meeting Now
+                            this.notificationsAdapter.removeNotification(this.getAlertNotification(meeting))
+                        );
+                    })
+                )
+        );
 
     }
 
     fetchMeetings(): void {
-        console.log('fetchMeetings');
         this.store.dispatch(fetchMeetingList({}));
     }
 
     private getMeeting(id ?: string): fromMeeting.Meeting {
-        const dueDate = ~~(Date.now() / 1000) + 60;
+        const dueDate = ~~(Date.now() / 1000) + 30;
         return {
-            title: 'Meeting' + Math.random(),
-            dueDate,
-            id: id || ~~(Math.random() * 1000) + ''
+            title: 'M' + id,
+            dueDateTimeStamp: dueDate,
+            id: id || ~~(Math.random() * 100) + ''
         }
     }
 
-    private getNotificationFromMeeting(meeting, type) {
+    private getNotificationFromMeeting(meeting, type): MeetingNotification {
         const id = meeting.id + '-' + type;
-        return this.getNotification({id, type});
+        return this.getNotification({id, type, title: type === 'error' ? 'Create Error' : 'Create Success'});
+    }
+    private getReminderNotification(meeting: Meeting): MeetingNotification {
+        const type = 'information';
+        const id = meeting.id + '-' + type;
+        const remainingSeconds = ~~(Date.now() / 1000 - meeting.dueDateTimeStamp);
+        return this.getNotification({id, type, title: `Starts in ${remainingSeconds}s!`});
+    }
+    private getAlertNotification(meeting: Meeting): MeetingNotification {
+        const type = 'error';
+        const id = meeting.id + '-' + type;
+        const remainingSeconds = Date.now() / 1000 - meeting.dueDateTimeStamp;
+        return this.getNotification({id, type, title: `${meeting.title} starts now!`});
     }
 
     private getNotification(data: Partial<MeetingNotification>): MeetingNotification {
-        const dueDate = ~~(Date.now() / 1000) + 60;
-        const id = data.id || ~~(Math.random() * 1000) + '';
+        const id = data.id || ~~(Math.random() * 100) + '';
         delete data.id;
         return {
-            title: 'Notification' + Math.random(),
+            title: 'Notification',
             type: 'information',
             ...data,
             id
@@ -132,6 +194,15 @@ export function createNotificationAdapter(notifications$: Observable<EntityState
         })),
         take(1)
     );
+
+    const upsertNotification = (notification) => notifications$.pipe(
+        map(notifications => ({
+            notifications: notificationsAdapter
+                .upsertOne(notification, notifications)
+        })),
+        take(1)
+    );
+
     const removeNotification = (notification) => notifications$.pipe(
         map(notifications => ({
             notifications: notificationsAdapter
@@ -142,6 +213,7 @@ export function createNotificationAdapter(notifications$: Observable<EntityState
 
     return {
         addNotification,
+        upsertNotification,
         removeNotification
     }
 
