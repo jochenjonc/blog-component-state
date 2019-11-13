@@ -61,13 +61,13 @@ It is the state we share globally in our app i.e. a `@ngRx/store` or the good ol
 
 This is not called an ephemeral state, but the persistent state.
 
-![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_global-accessible-state__michael-hladky.png "Global Accessible State")
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_global-accessible__michael-hladky.png "Global Accessible State")
 
 As we can see one global source distributes state to the whole app.
  
 If we compare this to a local state we see that this data structure is provided and managed only in a certain scope of your app.
 
-![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_local-accessible-state__michael-hladky.png "Local Accessible State")
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_local-accessible__michael-hladky.png "Local Accessible State")
 
 This is our first rue of thumb to detect local state: 
 
@@ -84,15 +84,13 @@ This is static called a static lifetime.
 
 
 If we compare this to the lifetime of other building blocks of angular we can see their life time is way more dynamic.
-![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-global-singleton-service__michael-hladky.png "Lifetime Global Singleton Service")
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-angular-building-blocks__michael-hladky.png "Lifetime Angular Building Blocks")
 
 The best example of a dynamic lifetime is data that gets rendered over the `async` pipe.
 
-![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-angular-building-blocks__michael-hladky.png "Lifetime Angular Building Blocks")
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-async-pipe__michael-hladky.png "Lifetime async Pipe")
 
 The lifetime depends on the evaluation of the template expression, a potential `*ngIf` that wraps the expression or many other things.
-
-![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-async-pipe__michael-hladky.png "Lifetime async Pipe")
 
 Our second rule of thumb we detected for the local state is: 
 
@@ -109,7 +107,7 @@ Where our global state service nearly always processes remote sources:
 
 And te logic is located in the upper layer of our architecture. 
 
-![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_processing-global-sources__michael-hladky.png "Processing of Global Sources")
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-changes_processing-global-sources__michael-hladky.png "Processing of Global Sources")
 
 
 A local state service would nearly always focus on the process the following: 
@@ -118,7 +116,7 @@ A local state service would nearly always focus on the process the following:
 - Component level Side-Effects
 - Parsing global state to local
 
-![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_processing-local-sources__michael-hladky.png "Processing of Local Sources")
+![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-changes_processing-local-sources__michael-hladky.png "Processing of Local Sources")
 
 
 A a third rule of thumb we say: 

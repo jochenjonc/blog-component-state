@@ -102,7 +102,7 @@ export class NotificationContainerModel extends LocalState<INotificationContaine
             this.meetingPostSuccess$
                 .pipe(
                     mergeMap(meeting => {
-                        const fadeOutDelay = EMPTY.pipe(delay(5500));
+                        const fadeOutDelay = EMPTY.pipe(delay(2500));
                         const updatePeriod = EMPTY.pipe(delay(5000));
                         const timeOfFirstNotification = new Date(meeting.dueDateTimeStamp  * 1000);
                         timeOfFirstNotification.setSeconds(timeOfFirstNotification.getSeconds()-15);
@@ -161,7 +161,7 @@ export class NotificationContainerModel extends LocalState<INotificationContaine
     private getReminderNotification(meeting: Meeting): MeetingNotification {
         const type = 'information';
         const id = meeting.id + '-' + type;
-        const remainingSeconds = ~~(Date.now() / 1000 - meeting.dueDateTimeStamp);
+        const remainingSeconds = ~~(meeting.dueDateTimeStamp - Date.now() / 1000);
         return this.getNotification({id, type, title: `Starts in ${remainingSeconds}s!`});
     }
     private getAlertNotification(meeting: Meeting): MeetingNotification {
