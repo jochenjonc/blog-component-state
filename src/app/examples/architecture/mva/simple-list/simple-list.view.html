@@ -1,34 +1,39 @@
 <h3>Simple List Component</h3>
-<mat-expansion-panel
-        *ngIf="a.select() | async as state"
-        (expandedChange)="listExpandedChanges.next($event)"
-        [expanded]="state.listExpanded">
-    <mat-expansion-panel-header>
-        <mat-panel-title>
-            User Name
-        </mat-panel-title>
-        <mat-panel-description>
-            <span *ngIf="!state.listExpanded">{{state.list.length}} Repositories</span>
-            <span *ngIf="state.listExpanded">{{state.list.length}}</span>
-        </mat-panel-description>
-    </mat-expansion-panel-header>
 
-    <!-- NOTE: in the view the only variable we want to touch is `vm`-->
-    <button mat-raised-button color="primary"
-            (click)="refreshClicks.next($event)">
-        Refresh List
-    </button>
+<ng-container *ngIf="((listExpanded$ | async) || true) as listExpanded">
+    <ng-container *ngIf="((list$ | async) || true) as list">
+        <mat-expansion-panel
+                (expandedChange)="listExpandedChanges.next($event)"
+                [expanded]="listExpanded">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    User Name
+                </mat-panel-title>
+                <mat-panel-description>
+                    <span *ngIf="!listExpanded">{{list.length}} Repositories</span>
+                    <span *ngIf="listExpanded">{{list.length}}</span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
 
-    <div *ngIf="state.list.length; else noList">
-        <mat-list>
-            <mat-list-item *ngFor="let item of state.list">
-                {{item.name}}
-            </mat-list-item>
-        </mat-list>
-    </div>
+            <!-- NOTE: in the view the only variable we want to touch is `vm`-->
+            <button mat-raised-button color="primary"
+                    (click)="refreshClicks.next($event)">
+                Refresh List
+            </button>
 
-    <ng-template #noList>
-        <mat-card>No list given!</mat-card>
-    </ng-template>
 
-</mat-expansion-panel>
+            <ng-container *ngIf="list.length; else noList">
+                <mat-list>
+                    <mat-list-item *ngFor="let item of list">
+                        {{item.name}}
+                    </mat-list-item>
+                </mat-list>
+            </ng-container>
+            <ng-template #noList>
+                <mat-card>No list given!</mat-card>
+            </ng-template>
+
+
+        </mat-expansion-panel>
+    </ng-container>
+</ng-container>

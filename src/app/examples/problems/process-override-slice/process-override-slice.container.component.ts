@@ -12,7 +12,8 @@ import {map, switchMap} from "rxjs/operators";
     <process-override-slice-good>
     </process-override-slice-good>        
     `,
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [ProcessHandlerGoodService]
 })
 export class ProcessOverrideSliceContainerComponent {
     state$ = this.pH.state$;

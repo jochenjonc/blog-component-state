@@ -26,7 +26,8 @@ interface ProcessState {
         </button>
         <pre>{{state$ | async | json}}</pre>
     `,
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [ProcessHandlerBadService]
 })
 export class ProcessOverrideSliceBadComponent {
     state$ = this.pH.state$;

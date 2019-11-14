@@ -1,42 +1,22 @@
-import {LocalState} from "@common";
-import {SimpleListItem} from "../../interfaces";
-import {Store} from "@ngrx/store";
-import {fetchRepositoryList, RepositoryListItem, selectGitHubList} from "@data-access/github";
 import {map, tap} from "rxjs/operators";
 import {Subject} from "rxjs";
+import {SimpleListModel} from "./simple-list.model";
+import {ISimpleListView} from "./simple-list.view.interface";
+import {Injectable} from "@angular/core";
 
-export class SimpleListAdapter extends LocalState<{
-    list?: SimpleListItem[],
-    listExpanded?: boolean
-}> {
-    // Initial view config
-    private initState = {
-        listExpanded: false,
-        list: []
-    };
+@Injectable()
+export class SimpleListAdapter implements ISimpleListView {
+    list$ = this.m.select(map(s => s.list));
+    listExpanded$ = this.m.select(map(s => s.listExpanded));
+    listExpandedChanges = new Subject<boolean>();
+    refreshClicks = new Subject<Event>();
 
-    refreshRequest = new Subject();
-    // State from other sources
-    private globalList = this.store.select(selectGitHubList)
-        .pipe(map(this.parseListItems));
-    private refreshEffect = this.refreshRequest
-        .pipe(tap(_ => this.store.dispatch(fetchRepositoryList({})))
-        );
-
-
-    constructor(private store: Store<any>) {
-        super();
-        this.setState(this.initState);
-        this.connectState(this.globalList
-            .pipe(map(list => ({list})))
-        );
-        this.connectEffect(this.refreshEffect);
+    constructor(private m: SimpleListModel) {
+        this.refreshClicks
+            .subscribe(_ => {
+                console.log('S');
+                this.m.refreshMeetingEvent.next(_);
+            });
     }
-
-    // Map RepositoryListItem to ListItem
-    private parseListItems(l: RepositoryListItem[]): SimpleListItem[] {
-        return l.map(({id, name}) => ({id, name}))
-    }
-
 
 }
