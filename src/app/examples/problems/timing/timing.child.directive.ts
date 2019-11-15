@@ -1,28 +1,30 @@
 import {Directive, Input, OnChanges, OnDestroy, OnInit} from '@angular/core';
+import {TimingLocalService} from "./timing.local.service";
+import {LoggerService} from "@common";
 
 @Directive({
     selector: '[timing-child-dir]'
 })
 export class TimingChildDirective implements OnChanges, OnInit, OnDestroy {
 
-    constructor() {
-        console.log('ChildDirective Constructor');
+    constructor(private logger: LoggerService) {
+        this.logger.log({creator: 'directive', msg: 'ChildDirective Constructor'});
     }
 
     @Input() set value(v) {
-        console.log('ChildDirective Input', v);
+        this.logger.log({msg: 'ChildDirective Input', data: v, creator: 'directive'});
     }
 
     ngOnChanges(changes) {
-        console.log('ChildDirective OnChanges', changes);
+        this.logger.log({msg: 'ChildDirective OnChanges', data: changes, creator: 'directive'});
     }
 
     ngOnInit() {
-        console.log('ChildDirective ngOnInit');
+        this.logger.log({creator: 'directive', msg: 'ChildDirective ngOnInit'});
     }
 
     ngOnDestroy() {
-        console.log('ChildDirective OnDestroy');
+        this.logger.log({creator: 'directive', msg: 'ChildDirective OnDestroy'});
     }
 
 }

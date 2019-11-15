@@ -1,26 +1,27 @@
 import {OnDestroy, OnInit, Pipe, PipeTransform} from '@angular/core';
 import {TimingGlobalService} from './timing.global.service';
+import {LoggerService} from "@common";
 
 @Pipe({
     name: 'childPipe'
 })
 export class TimingChildPipe implements PipeTransform, OnInit, OnDestroy {
 
-    constructor(private globalService: TimingGlobalService) {
-        console.log('ChildPipe Constructor');
+    constructor(private globalService: TimingGlobalService, private logger: LoggerService) {
+        this.logger.log({creator: 'pipe', msg: 'ChildPipe Constructor'});
     }
 
     transform(value, args?): any {
-        console.log('ChildPipe transform', value);
+        this.logger.log({msg: 'ChildPipe transform',data: value, creator: 'pipe'});
         return value;
     }
 
     ngOnInit(): void {
-        console.log('ChildPipe OnInit');
+        this.logger.log({creator: 'pipe', msg: 'ChildPipe OnInit'});
     }
 
     ngOnDestroy() {
-        console.log('ChildPipe OnDestroy');
+        this.logger.log({creator: 'pipe', msg: 'ChildPipe OnDestroy'});
     }
 
 }

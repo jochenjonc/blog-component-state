@@ -1,6 +1,6 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {ConnectableObservable, merge, Observable, of, Subject, Subscription} from 'rxjs';
-import {distinctUntilChanged, groupBy, map, mergeAll, publishReplay, scan, switchMap, tap} from 'rxjs/operators';
+import {ConnectableObservable, merge, Observable, Subject, Subscription} from 'rxjs';
+import {distinctUntilChanged, groupBy, map, mergeAll, publishReplay, scan, tap} from 'rxjs/operators';
 
 const stateAccumulator = (acc, command): { [key: string]: number } => ({...acc, ...command});
 
@@ -49,7 +49,6 @@ export class ProcessHandlerGoodService<T> implements OnDestroy {
     }
 
     connectSlice(o: Observable<T>, behaviourName?: string, strategy = 'merge') {
-        console.log(strategy, behaviourName);
         this.stateObservables.next({changes: o, strategy, behaviourName});
     }
 
@@ -70,9 +69,7 @@ export class ProcessHandlerGoodService<T> implements OnDestroy {
             return behaviourConfig$.pipe(
                 // {behaviourName, observable} => Observable<>
                 groupBy((cfg) => cfg.behaviourName),
-                tap(v => console.log('OOOOO', v)),
                 map(gO => {
-
                     return gO.pipe(map(c => c.changes))
                 }),
                 mergeAll()

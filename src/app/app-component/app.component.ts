@@ -1,8 +1,6 @@
-import { Component } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import {Component} from '@angular/core';
 import {AppViewModel} from "./app.view.model";
+import {LoggerService} from "@common";
 
 @Component({
   selector: 'app-root',
@@ -11,7 +9,7 @@ import {AppViewModel} from "./app.view.model";
   providers: [AppViewModel]
 })
 export class AppComponent {
-  constructor(public vm: AppViewModel) {
-    console.log('AppComponent Constructor');
+  constructor(public vm: AppViewModel, private logger: LoggerService) {
+    this.logger.log('AppComponent Constructor');
   }
 }

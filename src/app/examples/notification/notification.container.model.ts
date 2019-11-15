@@ -47,7 +47,6 @@ export class NotificationContainerModel extends LocalState<INotificationContaine
                 private actions$: Actions) {
         super();
 
-        this.select().subscribe(console.log);
         this.store.select(fromMeeting.selectMeetingFeature);
         this.store.select(fromMeeting.selectAllMeetings)
             .pipe(map(meetings => ({meetings}))).subscribe(console.log);

@@ -37,9 +37,5 @@ export class SimpleListModel extends LocalState<{
         return l.map(({id, name}) => ({id, name}))
     }
 
-    ngOnDestroy() {
-        console.log('ngOnDestroy Model');
-    }
-
 }
 
