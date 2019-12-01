@@ -2,27 +2,34 @@
 
 <!-- toc -->
 
+  * [Historical problems with state management in the frontend](#historical-problems-with-state-management-in-the-frontend)
 - [Layers of state](#layers-of-state)
 - [What is the ephemeral state?](#what-is-the-ephemeral-state)
   * [Global vs Local Accessibility of Data Structures](#global-vs-local-accessibility-of-data-structures)
   * [Static vs Dynamic Lifetime of Data Structures](#static-vs-dynamic-lifetime-of-data-structures)
   * [Global vs Local Processed Sources](#global-vs-local-processed-sources)
   * [Recap](#recap)
-- [Problems to solve](#problems-to-solve)
-  * [Timing](#timing)
-- [Subscription Handling](#subscription-handling)
-  * [The Late Subscriber Problem](#the-late-subscriber-problem)
-  * [Sharing references (will not be solved by component-state)](#sharing-references-will-not-be-solved-by-component-state)
+- [Fundamental Architectural Decisions](#fundamental-architectural-decisions)
+  * [Problems to Solve on a Low Level](#problems-to-solve-on-a-low-level)
+    + [Timing](#timing)
+    + [Subscription Handling](#subscription-handling)
+    + [The Late Subscriber Problem](#the-late-subscriber-problem)
+    + [Sharing Work and References](#sharing-work-and-references)
   * [The Cold Composition Problem](#the-cold-composition-problem)
-  * [Imperative Interaction with Component StateManagement](#imperative-interaction-with-component-statemanagement)
+  * [Subscription-Less Interaction with Component StateManagement](#subscription-less-interaction-with-component-statemanagement)
+    + [Subscription-Less Handling of Side-Effects](#subscription-less-handling-of-side-effects)
   * [Recap](#recap-1)
+- [Basic Usage](#basic-usage)
+  * [Service Design](#service-design)
+  * [Service Implementation](#service-implementation)
+  * [Service Usage](#service-usage)
+- [Glossar](#glossar)
+- [Rethinking Components based on Ephemeral State Management](#rethinking-components-based-on-ephemeral-state-management)
 - [Dynamic Component State and Reactive Context](#dynamic-component-state-and-reactive-context)
   * [Initialisation and Cleanup](#initialisation-and-cleanup)
   * [Overriding State Changes and Effects](#overriding-state-changes-and-effects)
-- [Glossar](#glossar)
 
 <!-- tocstop -->
-
 
 ## Historical problems with state management in the frontend
 
