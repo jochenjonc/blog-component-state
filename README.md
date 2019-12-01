@@ -1,8 +1,4 @@
-# Reactive Local State
-
-@TODOS:
-- 
-- Grammarly
+# Tackling Componen-State Reactively
 
 <!-- toc -->
 
@@ -27,19 +23,57 @@
 
 <!-- tocstop -->
 
-# Layers of state
 
+## Historical problems with state management in the frontend
+
+When I started with the topic of state management I encountered 2 main problems I had
+which I also see in the majority of our community.
+
+1. We have a lack in education. We don't know enough of the fundamentals in IT. 
+2. We often tend to blindly copy stuff.
+
+Many of us did not know about global state management a year ago,
+even if these problems an many different solution were out there for a long tim e already.
+
+What happened not that long a go is people took over a concept from the react world called REDUX.
+They thought it is a pattern, It got advertised, articles got written and now we have the situation where 
+"the REDUX pattern" is a term. 
+In fact there is no REDUX pattern and also react or elm did not invented that.
+
+It's simple [CQRS](), a @TODO old software design design pattern. :D
+In my talk [Advanced Patterns in RxJS - Operating heavily dynamic UI'S]() I gave some basic information on that.
+
+As I did so often in my career, and others too, I blindly copied stuff over without questioning it.
+This is the reason why nowadays libraries often are a blind reimplementation of other wrong or inconsistent implementations.
+
+To give you some idea. In angular nearly all state management libs miss a layer for meta information.
+This leads to situations where people tend to put stuff in global state which clearly does not belong there.
+The status of some remote sources vs the state retrieved from them. 
+The data we fetch i.e. a list of items, is the **state on the server** that we want to use in the frontend vs 
+**the status of a resource**, i.e. if a connection is established, if it is currently loading/loaded
+or their meta information to responses as success and error information.
+
+So our fundamental problem we have at the moment is,
+we lack a clear understanding of the different layers of state 
+as well as their proper handling.
+
+
+# Layers of state
 
 In this article I will introduce 3 layers of state:
 - Persistent Server State
+- Resource Status Information (Meta-Level State)
 - Persistent Client State (Global State)
 - Ephemeral Client State (Local State)
 
 ![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_layers-of-state__michael-hladky.png "Layers of State")
 
 **Persistent Server State** is the data in your database. It is provided to the consumer over a data API like REST, GraphQL, Websocket, etc.
+**Meta-Level State** is information related to the status of a resource that provides us state. I.E. Loading, Error, Success etc.
 For persistent and ephemeral client states I will try to use to more simpler wording **Global State** and **Local State**, where ephemeral state maps to the local state.
-Both live on the client but they desire different treatments.
+Both live on the client but they demand different handling.
+
+In this article I want to focus on ephemeral state. 
 
 # What is the ephemeral state?
 
@@ -83,7 +117,7 @@ This is static called a static lifetime.
 ![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-global-singleton-service__michael-hladky.png "Lifetime Global Singleton Service")
 
 
-If we compare this to the lifetime of other building blocks of angular we can see their life time is way more dynamic.
+If we compare this to the lifetime of other building blocks of angular we can see their lifetime is way more dynamic.
 ![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-state_lifetime-angular-building-blocks__michael-hladky.png "Lifetime Angular Building Blocks")
 
 The best example of a dynamic lifetime is data that gets rendered over the `async` pipe.
@@ -119,7 +153,7 @@ A local state service would nearly always focus on the process the following:
 ![](https://github.com/BioPhoton/blog-component-state/raw/master/images/reactive-local-changes_processing-local-sources__michael-hladky.png "Processing of Local Sources")
 
 
-A a third rule of thumb we say: 
+The third rule of thumb we say: 
 
 > It processes local relevant events i.e. sort/filter change
 
@@ -146,12 +180,32 @@ In other words, there is no need to use state management libraries like ngrx, ng
 Still, we need a way to manage these data structures.
 
 
-# Problems to solve
-As a first and foundational decision in the way of data distribution, we will pick a push-based architecture. This has several advantages but more important defines the problems we will run into when implementing a solution.
+# Fundamental Architectural Decisions
 
+As a first and foundational decision in the way of data distribution, we will pick a push-based architecture.
+This has several advantages but more important defines the problems we will run into when implementing a solution.
 As we defined the way how we want to distribute our data let me list a set of problems we need to solve.
 
-## Timing
+## Problems to Solve on a Low Level
+
+If you go back in history you will find almost all our nowadays "cutting edge problems" already solved. 
+When I realized the first time that life is a constant evolutionary repetition I started to change my strategy on solving problems.
+
+Before I almost always started to implement a half backed cool idea which I was certain is most up to date.
+
+After I made many mistakes and got some incredibly helpful insights I changed my way of solving problems completely.
+
+Let me quote **The Gang Of Four** to give you a first glimpse of my fundamental changes in how I approach problems:
+
+So here is what the gang of four says about Object-Oriented-Software-Design-Patterns: 
+
+> If you use the fundamental building blocks of object oriented programming correctly,
+> the design patterns appear naturally from your code.
+
+With that in mind I did not work on a solution for local state management,
+but tried to look at all the different problems that we will face when managing any local state in general and also some specific problems related to Angular.
+
+### Timing
 
 As a lot of problems I ran into in applications are related to timing issues, 
 this section is here to give a quick overview of all the different types of issues and their reason.
@@ -174,7 +228,7 @@ In Angular timing is given by the following:
 - For local services the **creation** of the component as well as the components **lifetime**
 - For pipes or directives in the template also the components **lifetime**
 
-All timing relates things in Angular are in object-oriented style, very similar to hot observables.
+All timing relates things in Angular are in an object-oriented style, very similar to hot observables.
 Subscription handling can be done declaratively over completion operators. 
 The scheduling process can be controlled both over imperative or over operators and can influence the execution context of the next error or complete callback.
 
@@ -193,13 +247,13 @@ In this example it marks:
 As we can see It makes a big difference where we place observables and where we subscribe to them. 
 It also shows where we need hot observables and where we need to replay values.
 
-# Subscription Handling
+### Subscription Handling
 
 Let's discuss where subscriptions should take place and for which reason they are made.
 
 Subscriptions are here to receive values from any source.
 
-In most cases, we want to render the incoming values.
+In most cases, we want to render incoming values.
 For this reason, we use a `Pipe` or a `Directive` in the template to trigger
 change-detection whenever a value arrives.
 
@@ -272,7 +326,7 @@ export class SubscriptionHandlingComponent {
 
 In this way, we get rid of thinking about subscriptions in the component at all.
 
-## The Late Subscriber Problem
+### The Late Subscriber Problem
 
 ![](https://github.com/BioPhoton/blog-component-state/raw/master/images/late-subscriber__michael-hladky.png "Late Subscriber")
 
@@ -339,10 +393,9 @@ And that's not what we want.
 Another downside is the bundle size of ShareReplay. 
 But it will be used anyway somewhere in our architecture, so it's a general downside.
 
-## Sharing references (will not be solved by component-state) 
-@TODO Hard rewrite!
-Let me front off explain that this section is specifically here to explain
-why this problem **should not be part of the components state-management**.
+### Sharing Work and References
+
+In this section we will face the first time a problem that might need some more thinking.
 
 To start this section let's discuss the components implementation details first.
 We focus on the component's outputs. 
@@ -356,7 +409,7 @@ export class AnyComponent {
 }
 ```
 
-Let's take a closer look at EventEmitter interface:
+Let's take a closer look at the EventEmitter interface:
 `EventEmitter<T extends any> extends Subject<T>`
 And `Subject` looks like this:
 `Subject<T> extends Observable<T> implements SubscriptionLike`
@@ -372,17 +425,22 @@ export class AnyComponent {
     @Output() compOutput = interval(1000);
 }
 ```
-An observable for example holds a subscribe method in it
+An observable for example provides a `subscribe` method. 
+Therefor we can directly use it as value stream for our `@Output` binding.
 
-With this in mind let's focus on the original problem, sharing a reference.
+Knowing that enables us to take some very nice and elegant shortcuts as well as reducing the amount of code we need to write.
 
-In this example, we receive a config object from the parent component and emit changes from the form group created out of the config object.
+With this in mind let's focus on the original problem, sharing a work and references.
+
+In this example, we receive a config object from the parent component
+turn it into a reactive form and 
+emit changes from the form group created out of the config object.
 
 Every time we receive a new value from the input binding 
 - we create a config object out of it
 - and use the `FormBuilder` service to create the new form.
 As output value, we have to provide something that holds a `subscribe` method.
-So we could use the form groups `value changes` to provide the forms changes directly as component output events.
+So we could use the form groups `valueChanges` to provide the forms changes directly as component output events.
 
 ```typescript
 @Component({
@@ -426,17 +484,27 @@ export class SharingAReferenceComponent {
 }
 ```
 
-But the values are not updating in the parent component.
-We forgot that our `formGroup$` observable ends with a `map` operator,
-which returns are a uni-cast observable.
+If we run the code we will see that the values are not updating in the parent component.
 
-What happened is we subscribed once in the template over the `async` pipe to render the form.
+We faced a problem related to the fact that nearly all observables are cold, which means that every subscriber will get it's own instance of the producer.
+
+You might be even more confused now, as our source that produces the formGroup is a `ReplaySubject`.
+Which is multi-casting values and sharing one producer with multiple subscribers...
+
+What we forgot here is that our `formGroup$` observable ends with a `map` operator,
+which turns everything after it again into a uni-cast observable.
+
+So what happened? 
+We subscribed once in the template over the `async` pipe to render the form.
 And another time in the component internals to emit value changes from the form.
 
-As `formGroup$` is uni-cast we created a new `FormGroup` instance for every subscription.
+As we now know that the map operator turned everything into a uni-cast observable again,
+we realize created a new `FormGroup` instance for every subscription.
+The subscription in the template as well as the subscription happens internally over @Output().
 
 This can be solved by adding a multicast operator like `share` or `shareReplay` at the end of `formGroup$`.
-As we also have late subscribers (`async` pipe in the template), we use `shareReplay` with `bufferSize` 1. 
+
+As we also have late subscribers, the `async` pipe in the template, we use `shareReplay` with `bufferSize` 1 serve them the actual formGroup instance. 
 
 ```typescript
    formGroup$: Observable<FormGroup> = this.state$
@@ -452,11 +520,9 @@ So the subscription in the template and the subscription in the components inter
 
 Important to notice here is that `shareReplay` is cold but multicast. 
 This means it only subscribes to the source if at least one subscriber is present.
-This does not solve the problem of cold composition.
+This does not solve the problem of cold composition but is fine to share specific work or in this case a reference.
 
-As this kind of problem nearly only to component internal instances, it should not
-be part of the components state-management.
-Also, we never store references of class instances in the store as it takes away the whole idea of consistent, controlled state changes.
+Later on in this article we will remember this problem to provide a way to share work an instances.
 
 ## The Cold Composition Problem
 
@@ -464,15 +530,15 @@ Let's quickly clarify hot/cold and uni-case/multi-cast.
 
 **cold** 
 This means the producer sits inside of the observable.
-Whenever .subscribe is called the subscriber function fires and we create a new instance fo the producer.
-i.e. the static `interval` gets created whenever we subscribe to it.
+Whenever `subscribe` is called the subscriber function fires and we create a new instance fo the producer.
+i.e. the static `interval` gets created whenever we subscribe to it. 
+Internally `setInterval` and `clearInterval` is call for every `subscribe` and `unsubscribe`.
 
 **hot**
-This means the producer sits outside of the observable.
-The producer emits values independent of the subscriber. If .subscribe is called we will receive all values from the moment of subscription on. 
-The past values are not recognized.
-i.e. the `@Input` binding is a hot producer
-that sits outside of our `Subject` (extends `Observable`) and emits values independent of the moment when `async` pipe subscribes.
+This means the producer sits outside of the observable. The producer emits values independent of the subscriber. 
+
+If `subscribe` is called we will receive all values from the moment of subscription on, but past values are not recognized.
+i.e. the `@Input` binding is a hot producer that sits outside of our `Subject` and emits values independent of the moment when `async` pipe subscribes.
 
 **uni-cast**
 This means the producer is unique per subscription.
@@ -481,10 +547,10 @@ new function per subscription for the internal `.addEventListener` call.
 And if we unsubscribe we remove only this function, and not the others.
 
 **multi-cast**
-This means there is one producer instance fol all subscription.
+This means there is one producer instance fol all subscriptions.
 i.e. A subject that emits the values from a single producer to all subscribers.
 
-With this in mind, we can discuss the problem of cold composition in case of our component state.
+With this in mind, we can discuss the problem of cold composition in the case of our **component state**.
 
 --- 
 
@@ -494,18 +560,20 @@ As we will have to deal with:
 - Component State Changes ( triggered by button or interval )
 
 Putting all this logic in the component class is a bad idea. 
-Not only because of separations of concerns but also because we would have to implement it over and over again.
+Not only because of the separations of concerns but also because we would have to implement it over and over again.
 
-We need to make the logic that deals with problems around the composition
-reusable!
+We need to create the logic that deals with problems around the composition
+in a way that it can be reused!
 
 So far our sources got subscribed to when the view was ready and we rendered the state.
 As the view represents a hot producer of values and injected services too we have to decouple the service that handles component state from other sources.
 
-So what is the problem?!?!11
+**So what is the problem?!?! 11**
 
-We have hot sources and we have to compose them.
-As a minimal requirement to create state we should have at least the last emission of each source to compute a state.
+We have hot sources and we have to compose them. As we already learned in the section _sharing work and instances_ nearly every operator returns a cols source again. 
+No matter if it was hot before.
+
+Furthermore we can assume a minimal requirement to the created state is we should have at least the last emission of each source to compute a state.
 
 If we compose state we have to consider that every operator returns cold observables.
 (Operators that return `ConnectableObservable` are not operators as they are not compos-able)
@@ -548,13 +616,13 @@ But what services are we interested in?
 Stateful services and stateful services will, by definition, always provide there last emitted state.
 So if we compose other sources form services like `@ngRx/store` etc. we can assume they replay their last emitted state and we can run the composition.
 
-In worse case, we could fix it by contacting with an initial value. 
+In the worse case, we could fix it by contacting with an initial value. 
 
 Let's see a simple example where we compose different sources in service and one of our sources is not replaying the last value:
 
 **Service:**
 ```typescript
-export class SomeService implements OnDestroy {
+export class SomeBadService implements OnDestroy {
     // one channel for different requests for change
     commands$ = new Subject();
     composedState$ = this.commands$
@@ -598,14 +666,9 @@ export class ColdCompositionBadComponent implements OnDestroy {
         this.input$.next(value);
     }
 
-    constructor(public someBadService: SomeBadService) {
-        // earliest possible moment to forward values
-        this.input$.pipe(map(n => ({sum: n})))
-            .subscribe(
-                n => this.someBadService.commands$.next(n)
-            );
+    constructor(public someService: SomeService) {
          // earliest possible moment to subscribe to a service
-         this.someBadService.composedState$.subscribe(s => console.log('composedState bad: ', s) );
+         this.someService.composedState$.subscribe(s => console.log('composedState bad: ', s) );
     }
 
     ngOnDestroy(): void {
@@ -667,14 +730,14 @@ export class SomeService implements OnDestroy {
 We kept the component untouched and only applied changes to the service.
 
 We used the `publishReplay` operator to make the
-source replay the last emitted value.
+source replay the last emitted value by using `1` as `bufferSize`.
 
-In the service constructor, we called `.connect` to make it hot (subscribe to the source).
+In the service constructor, we called `connect` to make it hot subscribe to the source.
 
-## Imperative Interaction with Component StateManagement
+## Subscription-Less Interaction with Component StateManagement
 
-So far we only had focused on independent peace and didn't paid much attention to their interaction.
-Let's analyze the way we interact with components and services:
+So far we only had focused on independent peace and didn't pay much attention to their interaction.
+Let's analyze the way we interact with components and services so far.
 
 Well, known implementations of sate management like `@ngrx/store`,
 which is a global state management library, implemented the consumer-facing API imperatively.
@@ -687,7 +750,7 @@ Let's look at a simple example:
 export class StateService implements OnDestroy {
     private stateSubscription = new Subscription();
 
-    private stateSubject = new Subject<{ [key: string]: number }>();
+    private stateSubject = new Subject<{ [key: string]: any }>();
     state$ = this.stateSubject
         .pipe(
             map(obj => Object.entries(obj).pop()),
@@ -718,23 +781,29 @@ export class StateService implements OnDestroy {
     template: `
         <p>Imperative Interaction</p>
         <pre>{{state$ | async | json}}</pre>
-        <button (click)="updateCount()">
+        <button (click)="update$.next(true)">
             Update State
         </button>
     `,
 
     providers: [StateService]
 })
-export class AnyComponent {
+export class AnyComponent implements OnDestroy {
+    subscription = new Subscription();
+    update$ = new Subject();
     state$ = this.stateService.state$;
 
     constructor(private stateService: StateService) {
-
+        this.subscription = this.update$
+            .subscribe(() => {
+                 this.stateService
+                    .dispatch(({count: randomNumber()}));
+            });
     }
-
-    updateCount() {
-        this.stateService
-            .dispatch(({count: ~~(Math.random() * 100)}));
+    
+    ngOnDestroy() {
+        this.subscription
+            .unsubscribe();    
     }
 
 }
@@ -746,8 +815,12 @@ Whenever you write `setter` or `getter` you program in an imperative way because
 If we now think about the `dispatch` method of `@ngrx/store` or our implemented `subscribe` and `next` calls,
 we realize that it is similar to working with `setter` and `getter`.
 
-But how can we go more declarative or even reactive? By providing something compose-able.
-Like the observable itself.
+But how can we go more declarative or even reactive? 
+**By providing something compose-able**
+
+Like an observable itself. :)
+
+By adding a single line of code we can go **fully declarative as** well as  **fully subscription-less**.
 
 **Declarative Interaction Service**
 ```typescript
@@ -756,7 +829,7 @@ const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]:
 export class StateService implements OnDestroy {
     private stateSubscription = new Subscription();
     private stateAccumulator = stateAccumulator;
-    private stateSubject = new Subject<Observable<{ [key: string]: number }>>();
+    private stateSubject = new Subject<Observable<{ [key: string]: any }>>();
     state$ = this.stateSubject
         .pipe(
             // process observables of state changes
@@ -776,14 +849,14 @@ export class StateService implements OnDestroy {
         this.stateSubscription.unsubscribe();
     }
 
-    // "connector" with observable compose-able
-    connectSlice(o) {
+    // "connector" with observable (compose-able)
+    connect(o) {
         this.stateSubject.next(o);
     }
 
-
 }
 ```
+
 **Declarative Interaction Component**
 ```typescript
 @Component({
@@ -802,16 +875,43 @@ export class AnyComponent {
     update$ = new Subject();
 
     constructor(private stateService: StateService) {
-        this.stateService.connectSlice(this.update$
-            .pipe(map(_ => ({count: ~~(Math.random() * 100)}))));
+        this.stateService.connect(this.update$
+            .pipe(map(_ => ({count: randomNumber()}))));
     }
+}
+```
+
+Let's take a detailed look at the introduced changes:
+
+1. In `StateService` we changed 
+`stateSubject = new Subject<{ [key: string]: any }>();`
+to 
+`stateSubject = new Subject<Observable<{ [key: string]: any }>>();`
+2. In `StateService` we added the `mergeAll()` operator to ors state processing
+3. In `StateService` we replaced the `dispatch` method 
+```
+dispatch(v) {
+    this.stateSubject.next(v);
+}
+```
+that took a single value to `connect`
+```
+connect(o) {
+    this.stateSubject.next(o);
 }
 ```
 
 By providing the whole observable we can handle all related mechanisms
 of subscription handling, as well as value processing and emission in the service.
 
-With this we can now also handle our side-effects completely in the service:
+
+As a last additional benefit in this section we can talk a little bit about side-effects:
+
+### Subscription-Less Handling of Side-Effects
+
+If we recap the above snippet we can see that we not only introduced a subscription-less way for state management interaction, 
+but also a very elegant way to handle side-effects over our service:
+
 **Service**
 ```typescript
 export class DeclarativeSideEffectsGoodService implements OnDestroy {
@@ -851,7 +951,7 @@ export class DeclarativeSideEffectsGoodService implements OnDestroy {
 export class AnyComponent {
     constructor(private stateService: StateAndEffectService) {
         this.stateService.connectEffect(interval(1000)
-            .pipe(tap(_ => ({count: ~~(Math.random() * 100)}))));
+            .pipe(tap(_ => ({count: randomNumber()}))));
     }
 
 }
@@ -862,100 +962,228 @@ Note the side-effect is now placed in a `tap` operator and the whole observable 
 ## Recap
 
 So far we encountered the following topics:
-- _sharing a reference_ (not related to component state)
+- sharing work and references
 - subscription handling
 - late subscriber
 - cold composition
 - moving primitive tasks as subscription handling and state composition into another layer
 - declarative interaction between component and service
 
-If we would pipe every incoming value to a "thing" and implement the combination of the above problems
-I a single place.
+If you may already realize all the above problems naturally collapse into a single piece of code.
+:)
 
-Let's see how the solutions look like when we put them into i.e. a service.
+Also if you remember from the beginning this is what "the gang of four" quote says about Object Oriented Design Patterns.
+:)
 
-**LOW Level Component State Service**
+We can be happy as we did a great job so far. We focused on understanding the problems,
+we used the language specific possibilities the right way,
+and naturally we ended up with a solution that is compact, robust and solves all related problems in a elegant way.
+
+Let's see how the local state service looks like:
+
+# Basic Usage
+
+## Service Design
+
+**Local State Service**
 ```typescript
-const stateAccumulator = (acc, [key, value]: [string, number]): { [key: string]: number } => ({...acc, [key]: value});
-
-export class LowLevelStateService implements OnDestroy {
-    private subscription = new Subscription();
-    private stateAccumulator = stateAccumulator;
-    private effectSubject = new Subject<Observable<{ [key: string]: any }>>();
-    private stateSubject = new Subject<Observable<{ [key: string]: any }>>();
+export class LocalState implements OnDestroy {
+    private _subscription = new Subscription();
+    private _effectSubject = new Subject<Observable<any>>();
+    private _stateSubject = new Subject<{ [key: string]: any }>();
+    private _stateSubjectObservable = new Subject<Observable<{ [key: string]: any }>>();
     
-    state$ = this.stateSubject
+    private _state$ = merge(
+                        this._stateSubject,
+                        this._stateSubjectObservable.pipe(mergeAll()),
+                     )
         .pipe(
-            mergeAll(),
             map(obj => Object.entries(obj).pop()),
-            scan(this.stateAccumulator, {}),
+            scan((state, command) => ({...state, ...command}), {}),
             publishReplay(1)
-        ) as ConnectableObservable<any>;
+        );
 
 
     constructor() {
-        this.subscription.add(this.state$.connect());
-        this.subscription.add((this.effectSubject
-            .pipe(mergeAll(), publishReplay(1)
-            ) as ConnectableObservable<any>).connect()
+        this._subscription.add(this.state$.connect());
+        this._subscription.add(this.effectSubject
+            .pipe(mergeAll(), publishReplay(1)).connect()
         );
     }
-
-    connectSlice(o) {
-        this.stateSubject.next(o);
+  
+    select(operatos) {
+        return this._state$
+            .pipe(
+                operatos,
+                shareReplay(1)
+            );
+    }
+ 
+    setState(s) {
+        this._stateSubject.next(o);
+    }
+    connectState(o) {
+        this._stateSubject.next(o);
     }
 
     connectEffect(o) {
-        this.effectSubject.next(o);
+        this._effectSubject.next(o);
     }
     
-    ngOnDestroy(): void {
-        this.subscription.unsubscribe();
+    ngOnDestroy() {
+        this._subscription.unsubscribe();
     }
 
 }
 ```
 
-**LOW Level Component State Service**
+## Service Implementation
+
+Now lets see some minimal examples on how to use the service:
+
+**Extending the service**
 ```typescript
 @Component({
-    selector: 'low-level-state-component',
+    selector: 'component',
     template: `
-        <p>Low-Level StateService</p>
-        state$: <pre>{{state$ | async | json}}</pre>
-        <button (click)="btn$.next($event)">
-            Update Click Time
-        </button>
-    `,
-    providers: [LowLevelStateService]
+        <p>Component</p>
+        ...
+    `
 })
-export class AnyComponent {
-    sideEffect$ = interval(1000)
-        .pipe(tap(_ => (console.log('Dispatch action to global store'))));
+export class AnyComponent extends LocalState {
 
-    state$ = this.stateService.state$;
-
-    value$ = new Subject<number>();
-    @Input()
-    set value(value) {
-        this.value$.next(value);
-    }
-    btn$ = new Subject<any>();
-
-    constructor(private stateService: LowLevelStateService) {
-        this.stateService
-            .connectEffect(this.sideEffect$);
-        this.stateService
-            .connectSlice(this.value$.pipe(map(n => ({interval: n}))));
-        this.stateService
-            .connectSlice(this.btn$.pipe(map(e => ({time: e.timeStamp}))));
+    constructor() {
+        this.super();
     }
 
 }
 ```
 
+**Injecting the service**
+```typescript
+@Component({
+    selector: 'component',
+    template: `
+        <p>Component</p>
+        ...
+    `,
+    providers: [LocalState]
+})
+export class AnyComponent {
+
+    constructor(private stateService: LocalState) {
+    }
+
+}
+```
+
+## Service Usage
+
+**Connecting Input-Bindings**
+```typescript
+@Component({
+    selector: 'component',
+    template: `
+        <p>Component</p>
+        ...
+    `
+})
+export class AnyComponent extends LocalState {
+
+    @Input() 
+    set value(value) {
+        this.setState({slice: value})
+    }
+
+    constructor() {
+        this.super();
+    }
+
+}
+```
+
+**Connecting GlobalState**
+```typescript
+@Component({
+    selector: 'component',
+    template: `
+        <p>Component</p>
+        ...
+    `
+})
+export class AnyComponent extends LocalState {
+
+    @Input() 
+    set value(value) {
+        this.setState({slice: value})
+    }
+
+    constructor(private store: Store) {
+        this.connectState(
+            this.store.select(getStateSlice)
+                    .pipe(transformation)
+        );
+    }
+
+}
+```
+
+**Selecting LocalState**
+```typescript
+@Component({
+    selector: 'component',
+    template: `
+        <p>Component</p>
+        <button (click)="click$.next()">btn</button>
+        {{state$ | async}}
+    `
+})
+export class AnyComponent extends LocalState {
+    click$ = new Subject(); 
+    
+    state$ = this.select(
+        withLatestFrom(click$),
+        map(([state, _]) => state.slice)
+    );    
+   
+}
+```
+
+**Handling LocalSideEffects**
+
+```typescript
+@Component({
+    selector: 'component',
+    template: `
+        <p>Component</p>
+        ...
+    `
+})
+export class AnyComponent extends LocalState {
+    
+    constructor(private store: Store) {
+        this.connectEffect(interval(10000)
+            .pipe(tap(this.store.dispatch(loadDataAction)))
+        );
+    }
+
+}
+```
+
+# Glossar
+
+- Global State 
+- Local State
+- CQRS
+
+
+---
+
+# Rethinking Components based on Ephemeral State Management 
+
+
 # Dynamic Component State and Reactive Context
-With a more declarative interaction between component and service, we made a big change.
+With a more declarative interaction between components and service, we made a big change.
 We are now aware of the whole observable context. 
 
 The `next`, `error` and `compolete` notifications.
@@ -968,7 +1196,7 @@ Initializing the state worked well in global state management by providing a def
 Also with input bindings, we could set a default value. But there are situations where we need to initialize a not yet emitted state.
 In addition to that with a highly dynamic state like we have with the components state, we also have to think about the clean up unused state.
 
-With the declarative approach, we have now the ability to react on the completion of an observable.
+With the declarative approach, we have now the ability to react to the completion of an observable.
 
 The current accumulation function for the components state looks like this:
 
@@ -995,7 +1223,7 @@ const stateAccumulator = (state, [keyToDelete, value]: [string, number]): { [key
 };
 ```
 
-Now lets think about the following example:
+Now, let's think about the following example:
 
 ```typescript
 @Component({
@@ -1014,7 +1242,7 @@ export class StateInitAndCleanupComponent {
     }
 
     addDynamicState() {
-        this.componentState.connectSlice(this.getDynamicStateSlice())
+        this.componentState.connectState(this.getDynamicStateSlice())
     }
 
     getDynamicStateSlice(): Observable<{ [key: string]: number | undefined }> {
@@ -1077,7 +1305,4 @@ Let's discuss scenarios for both.
 **Override State Changes**
 
 
-# Glossar
 
-- Global State 
-- Local State

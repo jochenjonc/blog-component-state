@@ -1,22 +1,12 @@
 import {combineLatest, interval, merge, Subject, timer} from "rxjs";
-import {
-    endWith,
-    filter,
-    map,
-    scan,
-    shareReplay,
-    startWith,
-    switchMap,
-    take,
-    takeUntil,
-    withLatestFrom
-} from "rxjs/operators";
+import {endWith, map, scan, shareReplay, startWith, switchMap, takeUntil, withLatestFrom} from "rxjs/operators";
 import {Injectable} from "@angular/core";
 import {IListViewModelState} from "./list.view-model-state.interface";
 import {IListView} from "./list.view.interface";
 import {MatSelectionListChange} from "@angular/material";
 import {LocalState} from '@common';
 import {SimpleListItem} from "../../interfaces";
+
 @Injectable()
 export class ListViewModel extends LocalState<IListViewModelState> implements IListView {
     // Initial view config
@@ -39,7 +29,7 @@ export class ListViewModel extends LocalState<IListViewModelState> implements IL
 
     private idleRefreshClicks = this.refreshClicks.pipe(
       // withLatestFrom(this.select(s => s.refreshPending)),
-        // filter()
+      // filter()
     );
     private refreshInterval = combineLatest(
         this.idleRefreshClicks.pipe(startWith(0)),

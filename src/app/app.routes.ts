@@ -1,6 +1,6 @@
 import {ROUTES as COLD_COMPOSITION_ROUTES} from "./examples/problems/cold-composition/cold-composition.module";
 import {ROUTES as LATE_SUBSCRIBER_ROUTES} from "./examples/problems/late-subscriber/late-subscriber.module";
-import {ROUTES as TIMING_ROUTES} from "./examples/problems/timing/timing.module";
+// import {ROUTES as TIMING_ROUTES} from "./examples/problems/timing/timing.module";
 import {ROUTES as SUBSCRIPTION_HANDLING_ROUTES} from "./examples/problems/subscription-handling/subscription-handling.module";
 import {ROUTES as PROCESS_OVERRIDE_SLICE_ROUTES} from "./examples/problems/process-override-slice/process-override-slice.module";
 import {ROUTES as SHARING_A_REFERENCE_ROUTES} from "./examples/problems/sharing-a-reference/sharing-a-reference.module";
@@ -16,7 +16,7 @@ export const ROUTES = [
         pathMatch: 'full',
         redirectTo: 'timing'
     },
-    {path: 'timing', children: TIMING_ROUTES},
+    // {path: 'timing', children: TIMING_ROUTES},
     {path: 'subscription-handling', children: SUBSCRIPTION_HANDLING_ROUTES},
     {path: 'late-subscriber', children: LATE_SUBSCRIBER_ROUTES},
     {path: 'sharing-a-reference', children: SHARING_A_REFERENCE_ROUTES},

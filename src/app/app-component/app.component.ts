@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {AppViewModel} from "./app.view.model";
 import {LoggerService} from "@common";
+import {never} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,6 @@ import {LoggerService} from "@common";
 })
 export class AppComponent {
   constructor(public vm: AppViewModel, private logger: LoggerService) {
-    this.logger.log('AppComponent Constructor');
+
   }
 }

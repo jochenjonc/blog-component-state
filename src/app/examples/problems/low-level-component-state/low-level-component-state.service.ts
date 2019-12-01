@@ -1,6 +1,6 @@
 import {OnDestroy} from '@angular/core';
 import {ConnectableObservable, Observable, Subject, Subscription} from 'rxjs';
-import {mergeAll, publishReplay, scan} from 'rxjs/operators';
+import {mergeAll, publishReplay, scan, shareReplay} from 'rxjs/operators';
 
 export interface SliceConfig {
     starWith?: any,
@@ -18,7 +18,7 @@ export class LowLevelStateService implements OnDestroy {
         .pipe(
             mergeAll(),
             scan(stateAccumulator, {}),
-            publishReplay(1)
+            shareReplay(1)
         ) as ConnectableObservable<any>;
 
 
